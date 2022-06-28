@@ -1,13 +1,15 @@
 ﻿using System.IO;
 
-namespace JukeBoxLibrary.Domain
+namespace JukeboxLibrary.Domain
 {
     internal class Parser : IController
     {
         public string ParseLine { get; set; }
         public string FileName { get; set; }
 
+#pragma warning disable CS8618
         internal Parser(string argument)
+#pragma warning restore CS8618
         {
             ParseLine = argument;
         }

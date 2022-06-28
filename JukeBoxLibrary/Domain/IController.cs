@@ -1,4 +1,4 @@
-﻿namespace JukeBoxLibrary.Domain
+﻿namespace JukeboxLibrary.Domain
 {
     internal interface IController
     {

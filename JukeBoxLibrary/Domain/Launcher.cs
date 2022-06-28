@@ -4,16 +4,18 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using NAudio.Wave;
 
-namespace JukeBoxLibrary.Domain
+namespace JukeboxLibrary.Domain
 {
     internal class Launcher : IController
     {
-        private int _songCount;
+        //private int _songCount;
 
         public string SongFile { get; set; }
         public string NextOne { get; set; }
 
+#pragma warning disable CS8618
         internal Launcher(string argument)
+#pragma warning restore CS8618
         {
             SongFile = argument;
         }
@@ -37,25 +39,27 @@ namespace JukeBoxLibrary.Domain
             s.Start();
         }
 
-        private void DisplayOutput()
-        {
-            Console.Write("Now playing: ");
-            var c = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine(Stripper(SongFile));
-            Console.ForegroundColor = c;
+//        private void DisplayOutput()
+//        {
+//            Console.Write("Now playing: ");
+//            var c = Console.ForegroundColor;
+//            Console.ForegroundColor = ConsoleColor.Yellow;
+//            Console.WriteLine(Stripper(SongFile));
+//            Console.ForegroundColor = c;
 
-            _songCount++;
-            Console.WriteLine("Songs played so far: {0}", _songCount);
+//            _songCount++;
+//            Console.WriteLine("Songs played so far: {0}", _songCount);
 
-            Console.WriteLine();
-            Console.Write("Enter song pattern: ");
-            NextOne = Console.ReadLine();
-        }
+//            Console.WriteLine();
+//            Console.Write("Enter song pattern: ");
+//#pragma warning disable CS8601
+//            NextOne = Console.ReadLine();
+//#pragma warning restore CS8601
+//        }
 
-        private static string Stripper(string song)
-        {
-            return song.Substring(song.LastIndexOf('\\') + 1);
-        }
+        //private static string Stripper(string song)
+        //{
+        //    return song[(song.LastIndexOf('\\') + 1)..];
+        //}
     }
 }

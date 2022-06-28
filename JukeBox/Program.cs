@@ -1,7 +1,7 @@
-﻿using JukeBoxLibrary.Domain;
-using JukeBoxLibrary.Helpers;
+﻿using JukeboxLibrary.Domain;
+using JukeboxLibrary.Helpers;
 
-namespace JukeBox
+namespace Jukebox
 {
     internal static class Program
     {

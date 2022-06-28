@@ -1,4 +1,4 @@
-﻿namespace JukeBoxLibrary.Helpers
+﻿namespace JukeboxLibrary.Helpers
 {
     public static class Display
     {
