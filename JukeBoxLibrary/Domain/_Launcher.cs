@@ -6,7 +6,7 @@ using NAudio.Wave;
 
 namespace JukeboxLibrary.Domain
 {
-    internal class Launcher : IController
+    internal class _Launcher : IController
     {
         //private int _songCount;
 
@@ -14,7 +14,7 @@ namespace JukeboxLibrary.Domain
         public string NextOne { get; set; }
 
 #pragma warning disable CS8618
-        internal Launcher(string argument)
+        internal _Launcher(string argument)
 #pragma warning restore CS8618
         {
             SongFile = argument;

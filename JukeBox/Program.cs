@@ -1,5 +1,7 @@
-﻿using JukeboxLibrary.Domain;
+﻿using JukeboxLibrary;
+using JukeboxLibrary.Domain;
 using JukeboxLibrary.Helpers;
+using JukeboxLibrary.Interfaces;
 
 namespace Jukebox
 {
@@ -7,8 +9,10 @@ namespace Jukebox
     {
         private static void Main()
         {
-            Display.FlowerBox();
-            new Shell().Start();
+            //Display.FlowerBox();
+            //new Shell().Start();
+            IJukeboxEngine engine = new JukeboxEngine();
+            engine.Start();
         }
     }
 }

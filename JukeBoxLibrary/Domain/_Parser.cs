@@ -51,7 +51,7 @@ namespace JukeboxLibrary.Domain
 
         public void Next()
         {
-            new Launcher(FileName).Start();
+            new _Launcher(FileName).Start();
         }
 
         private static void NothingDoing()
