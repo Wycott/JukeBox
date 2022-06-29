@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32602.215
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JukeBox", "JukeBox\JukeBox.csproj", "{CB429A8D-7B1E-4F06-B656-72E3EBCE42AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jukebox", "JukeBox\Jukebox.csproj", "{CB429A8D-7B1E-4F06-B656-72E3EBCE42AB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JukeBoxLibrary", "JukeBoxLibrary\JukeBoxLibrary.csproj", "{2C3688FE-AC41-458E-A9D9-38A466F539E2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JukeboxLibrary", "JukeBoxLibrary\JukeboxLibrary.csproj", "{2C3688FE-AC41-458E-A9D9-38A466F539E2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
