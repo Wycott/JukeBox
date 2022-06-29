@@ -26,6 +26,7 @@ namespace JukeboxLibrary.MachineParts
             if (SongPlaying && Player != null)
             {
                 Player.Stop();
+                // TODO: Dispose too probably
                 SongPlaying = false;
             }
         }

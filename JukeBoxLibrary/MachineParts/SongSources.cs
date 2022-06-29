@@ -4,7 +4,7 @@ namespace JukeboxLibrary.MachineParts
 {
     public class SongSources : ISongSources
     {
-        public List<string> Sources { get; set; } = new List<string>();
+        public List<string> Sources { get; set; } = new();
 
         public SongSources()
         {

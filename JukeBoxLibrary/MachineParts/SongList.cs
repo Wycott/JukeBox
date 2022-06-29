@@ -5,7 +5,7 @@ namespace JukeboxLibrary.MachineParts
 {
     public class SongList : ISongList
     {
-        public List<ISong> SongCollection { get; set; } = new List<ISong>();
+        public List<ISong> SongCollection { get; set; } = new();
 
         public void Build(ISongSources sources, string selectedPattern)
         {
