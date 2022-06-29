@@ -23,7 +23,7 @@
         public static bool IsThisTheRightSong(string candidate)
         {
             Console.Write("Found: ");
-            Display.WriteText(candidate);
+            WriteText(candidate);
             Console.Write("Play this y/n? ");
             var cki = Console.ReadKey();
             Console.WriteLine();

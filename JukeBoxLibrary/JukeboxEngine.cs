@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using JukeboxLibrary.Helpers;
+﻿using JukeboxLibrary.Helpers;
 using JukeboxLibrary.Types;
 using JukeboxLibrary.Interfaces;
 
@@ -32,8 +27,9 @@ namespace JukeboxLibrary
 
         private void LetTheMusicPlay() // Ru
         {
-            string selectedPattern = string.Empty;
-            string selectedSong = string.Empty;
+            var selectedPattern = string.Empty;
+            var selectedSong = string.Empty;
+
             while (true)
             {
                 switch (JukeboxState)
@@ -53,7 +49,11 @@ namespace JukeboxLibrary
                         }
                         break;
                     case JukeboxStateType.FindSong:
-                        SongList.Build(SongSources, selectedPattern);
+                        if (selectedPattern != null)
+                        {
+                            SongList.Build(SongSources, selectedPattern);
+                        }
+
                         if (SongList.SongCollection.Count > 0)
                         {
                             JukeboxState = JukeboxStateType.SelectVersion;
@@ -85,20 +85,10 @@ namespace JukeboxLibrary
                         SongPlayer.PlaySong(selectedSong);
                         JukeboxState = JukeboxStateType.RequestSong;
                         break;
-                    //case JukeboxStateType.StopSong:
-                    //    break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
             }
         }
-
-        //private static void WriteText(string data)
-        //{
-        //    var c = Console.ForegroundColor;
-        //    Console.ForegroundColor = ConsoleColor.White;
-        //    Console.WriteLine(data);
-        //    Console.ForegroundColor = c;
-        //}
     }
 }

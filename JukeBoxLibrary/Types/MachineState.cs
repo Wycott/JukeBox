@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace JukeboxLibrary.Types
+﻿namespace JukeboxLibrary.Types
 {
     public enum JukeboxStateType
     {
@@ -13,8 +7,6 @@ namespace JukeboxLibrary.Types
         RequestSong,
         FindSong,
         SelectVersion,
-        //ShowStats,
-        PlaySong,
-        //StopSong
+        PlaySong
     }
 }

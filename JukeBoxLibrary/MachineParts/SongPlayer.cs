@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using JukeboxLibrary.Interfaces;
+﻿using JukeboxLibrary.Interfaces;
 using NAudio.Wave;
 
 namespace JukeboxLibrary.MachineParts
 {
     public class SongPlayer : ISongPlayer
     {
-        private Mp3FileReader FileReader { get; set; }
-        private WaveOutEvent Player { get; set; }
+        private Mp3FileReader? FileReader { get; set; }
+        private WaveOutEvent? Player { get; set; }
 
         // TODO: Might be able to interrogate the various objects but surely this is easier
         private bool SongPlaying { get; set; }
@@ -28,7 +23,7 @@ namespace JukeboxLibrary.MachineParts
 
         private void CheckForPlayingSong()
         {
-            if (SongPlaying)
+            if (SongPlaying && Player != null)
             {
                 Player.Stop();
                 SongPlaying = false;
