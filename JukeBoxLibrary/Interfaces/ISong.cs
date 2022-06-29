@@ -2,6 +2,6 @@
 {
     public interface ISong
     {
-        string FullPath{ get; set; }
+        string FullPath { get; set; }
     }
 }

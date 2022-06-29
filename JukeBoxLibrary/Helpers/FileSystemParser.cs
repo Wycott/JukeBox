@@ -22,8 +22,8 @@ namespace JukeboxLibrary.Helpers
                         {
                             if (ExtensionsOk(possibleSongFile))
                             {
-                                
-                                retVal.Add(new Song() { FullPath = possibleSongFile});
+
+                                retVal.Add(new Song() { FullPath = possibleSongFile });
                             }
                         }
                     }

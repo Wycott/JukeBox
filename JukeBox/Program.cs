@@ -9,8 +9,8 @@ namespace Jukebox
         private static void Main()
         {
             IJukeboxEngine engine = new JukeboxEngine(
-                new SongSources(), 
-                new SongList(), 
+                new SongSources(),
+                new SongList(),
                 new SongPlayer());
 
             engine.Start();
