@@ -12,6 +12,33 @@
             Console.ForegroundColor = c;
         }
 
+        public static void WriteText(string data)
+        {
+            var c = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(data);
+            Console.ForegroundColor = c;
+        }
+
+        public static bool IsThisTheRightSong(string candidate)
+        {
+            Console.Write("Found: ");
+            Display.WriteText(candidate);
+            Console.Write("Play this y/n? ");
+            var cki = Console.ReadKey();
+            Console.WriteLine();
+            return (cki.Key == ConsoleKey.Y);
+        }
+
+        public static void WriteError(string errorMessage)
+        {
+            var c = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(errorMessage);
+            Console.WriteLine();
+            Console.ForegroundColor = c;
+        }
+
         private static void WriteText()
         {
             var lines = new List<string> {

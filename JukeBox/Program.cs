@@ -2,6 +2,7 @@
 using JukeboxLibrary.Domain;
 using JukeboxLibrary.Helpers;
 using JukeboxLibrary.Interfaces;
+using JukeboxLibrary.MachineParts;
 
 namespace Jukebox
 {
@@ -11,7 +12,7 @@ namespace Jukebox
         {
             //Display.FlowerBox();
             //new Shell().Start();
-            IJukeboxEngine engine = new JukeboxEngine();
+            IJukeboxEngine engine = new JukeboxEngine(new SongSources(), new SongList(), new SongPlayer());
             engine.Start();
         }
     }

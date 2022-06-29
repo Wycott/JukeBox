@@ -11,8 +11,10 @@ namespace JukeboxLibrary.Types
         Unknown,
         ShowTitleBox,
         RequestSong,
-        ShowStats,
-        PlayingSong,
-        StopSong
+        FindSong,
+        SelectVersion,
+        //ShowStats,
+        PlaySong,
+        //StopSong
     }
 }
