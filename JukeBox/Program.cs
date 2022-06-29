@@ -6,6 +6,7 @@ namespace Jukebox
 {
     internal static class Program
     {
+        // TODO : DI
         private static void Main()
         {
             IJukeboxEngine engine = new JukeboxEngine(

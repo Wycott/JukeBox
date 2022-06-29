@@ -1,4 +1,5 @@
-﻿namespace JukeboxLibrary.Helpers
+﻿// TODO: Static to reduce noise
+namespace JukeboxLibrary.Helpers
 {
     public static class Display
     {
