@@ -6,7 +6,7 @@
 
 ## Operation
 
-Currently the Jukebox will parse selected directories looking for music files (.mp3 & .m4a) of the given pattern. If one is found, it gives the user the opportunity to play it or skip to the next file that matches the pattern.
+The Jukebox will parse selected directories (currently hardcoded in **SongSources.cs**) looking for music files (.mp3 & .m4a) of the given pattern. If one is found, it gives the user the opportunity to play it or skip to the next file that matches the pattern.
 
 An example of a pattern would be:
 
