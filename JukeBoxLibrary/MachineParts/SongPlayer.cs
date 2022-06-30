@@ -1,4 +1,5 @@
-﻿using JukeboxLibrary.Interfaces;
+﻿using JukeboxLibrary.Helpers;
+using JukeboxLibrary.Interfaces;
 using NAudio.Wave;
 
 namespace JukeboxLibrary.MachineParts;
@@ -13,12 +14,20 @@ public class SongPlayer : ISongPlayer
 
     public void PlaySong(string filename)
     {
-        CheckForPlayingSong();
-        FileReader = new Mp3FileReader(filename);
-        Player = new WaveOutEvent();
-        Player.Init(FileReader);
-        Player.Play();
-        SongPlaying = true;
+        try
+        {
+            CheckForPlayingSong();
+            FileReader = new Mp3FileReader(filename);
+            Player = new WaveOutEvent();
+            Player.Init(FileReader);
+            Player.Play();
+            SongPlaying = true;
+        }
+        catch (InvalidOperationException)
+        {
+            Display.WriteError("Internal error - please pick another song");
+        }
+        
     }
 
     private void CheckForPlayingSong()
