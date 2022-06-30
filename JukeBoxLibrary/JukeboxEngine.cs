@@ -67,7 +67,7 @@ public class JukeboxEngine : IJukeboxEngine
                 case JukeboxStateType.SelectVersion:
                     foreach (var song in SongList.SongCollection)
                     {
-                        var isRightSong = Display.IsThisTheRightSong(song.FileName);
+                        var isRightSong = Display.IsThisTheRightSong(song.FullPath);
                         if (isRightSong)
                         {
                             selectedSong = song.FullPath;
