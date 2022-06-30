@@ -1,57 +1,59 @@
 ﻿using JukeboxLibrary.Interfaces;
 using JukeboxLibrary.MachineParts;
 
-namespace JukeboxLibrary.Helpers
+namespace JukeboxLibrary.Helpers;
+
+public static class FileSystemParser
 {
-    public static class FileSystemParser
+    public static List<ISong> ParseFileSystem(ISongSources mediaDrives, string huntString)
     {
-        public static List<ISong> ParseFileSystem(ISongSources mediaDrives, string huntString)
+        var retVal = new List<ISong>();
+
+        // TODO: Maybe do this elsewhere
+        huntString = PreparePattern(huntString);
+
+        foreach (var drive in mediaDrives.Sources)
         {
-            var retVal = new List<ISong>();
-
-            // TODO: Maybe do this elsewhere
-            huntString = PreparePattern(huntString);
-
-            foreach (var drive in mediaDrives.Sources)
+            foreach (var possibleSongDirectory in Directory.GetDirectories(drive))
             {
-                foreach (var possibleSongDirectory in Directory.GetDirectories(drive))
+                try
                 {
-                    try
+                    foreach (var possibleSongFile in Directory.GetFiles(possibleSongDirectory, huntString, SearchOption.AllDirectories))
                     {
-                        foreach (var possibleSongFile in Directory.GetFiles(possibleSongDirectory, huntString, SearchOption.AllDirectories))
+                        if (ExtensionsOk(possibleSongFile))
                         {
-                            if (ExtensionsOk(possibleSongFile))
-                            {
 
-                                retVal.Add(new Song() { FullPath = possibleSongFile });
-                            }
+                            retVal.Add(new Song() { FullPath = possibleSongFile });
                         }
                     }
-                    catch (UnauthorizedAccessException)
-                    {
-                        // Standard...
-                    }
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    // Standard...
                 }
             }
-
-            return retVal;
         }
 
-        private static bool ExtensionsOk(string candidate)
-        {
-            var extensions = new List<string> { ".mp3", ".m4a" };
+        return retVal;
+    }
 
-            foreach (var s in extensions)
+    private static bool ExtensionsOk(string candidate)
+    {
+        var extensions = new List<string> { ".mp3", ".m4a" };
+
+        foreach (var s in extensions)
+        {
+            if (candidate.Contains(s))
             {
-                if (candidate.Contains(s)) return true;
+                return true;
             }
-
-            return false;
         }
 
-        private static string PreparePattern(string initialPattern)
-        {
-            return "*" + initialPattern.Replace(' ', '*') + "*";
-        }
+        return false;
+    }
+
+    private static string PreparePattern(string initialPattern)
+    {
+        return "*" + initialPattern.Replace(' ', '*') + "*";
     }
 }

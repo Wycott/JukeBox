@@ -1,7 +1,6 @@
-﻿namespace JukeboxLibrary.Interfaces
+﻿namespace JukeboxLibrary.Interfaces;
+
+public interface IJukeboxEngine
 {
-    public interface IJukeboxEngine
-    {
-        void Start();
-    }
+    void Start();
 }

@@ -1,9 +1,8 @@
 ﻿using JukeboxLibrary.Interfaces;
 
-namespace JukeboxLibrary.MachineParts
+namespace JukeboxLibrary.MachineParts;
+
+public class Song : ISong
 {
-    public class Song : ISong
-    {
-        public string FullPath { get; set; } = string.Empty;
-    }
+    public string FullPath { get; set; } = string.Empty;
 }

@@ -1,7 +1,6 @@
-﻿namespace JukeboxLibrary.Interfaces
+﻿namespace JukeboxLibrary.Interfaces;
+
+public interface ISongSources
 {
-    public interface ISongSources
-    {
-        List<string> Sources { get; set; }
-    }
+    List<string> Sources { get; set; }
 }

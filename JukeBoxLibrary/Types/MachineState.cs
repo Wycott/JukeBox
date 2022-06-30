@@ -1,12 +1,11 @@
-﻿namespace JukeboxLibrary.Types
+﻿namespace JukeboxLibrary.Types;
+
+public enum JukeboxStateType
 {
-    public enum JukeboxStateType
-    {
-        Unknown,
-        ShowTitleBox,
-        RequestSong,
-        FindSong,
-        SelectVersion,
-        PlaySong
-    }
+    Unknown,
+    ShowTitleBox,
+    RequestSong,
+    FindSong,
+    SelectVersion,
+    PlaySong
 }

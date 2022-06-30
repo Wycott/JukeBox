@@ -1,7 +1,6 @@
-﻿namespace JukeboxLibrary.Interfaces
+﻿namespace JukeboxLibrary.Interfaces;
+
+public interface ISongPlayer
 {
-    public interface ISongPlayer
-    {
-        void PlaySong(string filename);
-    }
+    void PlaySong(string filename);
 }
