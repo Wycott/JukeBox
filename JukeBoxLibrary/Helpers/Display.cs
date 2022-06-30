@@ -25,7 +25,7 @@ public static class Display
     {
         Console.Write("Found: ");
         WriteText(candidate);
-        Console.Write("Play this y/n? ");
+        Console.Write("Play y/n? ");
         var cki = Console.ReadKey();
         Console.WriteLine();
         return (cki.Key == ConsoleKey.Y);

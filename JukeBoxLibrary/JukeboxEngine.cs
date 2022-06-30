@@ -41,7 +41,7 @@ public class JukeboxEngine : IJukeboxEngine
                     JukeboxState = JukeboxStateType.RequestSong;
                     break;
                 case JukeboxStateType.RequestSong:
-                    Console.Write("Enter song pattern: ");
+                    Console.Write("Enter pattern: ");
                     selectedPattern = Console.ReadLine();
                     if (!string.IsNullOrWhiteSpace(selectedPattern))
                     {
