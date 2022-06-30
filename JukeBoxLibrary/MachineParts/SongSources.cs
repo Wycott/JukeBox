@@ -16,7 +16,7 @@ public class SongSources : ISongSources
         // TODO: Should read from config or similar
         Sources = new List<string>()
         {
-            @"e:\",
+            @"E:\iTunes Music\",
             @"C:\Users\rober\Music\"
         };
     }
