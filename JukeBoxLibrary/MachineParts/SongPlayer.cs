@@ -27,7 +27,6 @@ public class SongPlayer : ISongPlayer
         {
             Display.WriteError("Internal error - please pick another song");
         }
-        
     }
 
     private void CheckForPlayingSong()
