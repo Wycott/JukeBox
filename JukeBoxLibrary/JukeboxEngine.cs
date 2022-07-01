@@ -67,8 +67,15 @@ public class JukeboxEngine : IJukeboxEngine
                 case JukeboxStateType.SelectVersion:
                     foreach (var song in SongList.SongCollection)
                     {
-                        var isRightSong = Display.IsThisTheRightSong(song.ShortenedPath);
-                        if (isRightSong)
+                        bool? isRightSong = Display.IsThisTheRightSong(song.ShortenedPath);
+
+                        if (isRightSong == null)
+                        {
+                            JukeboxState = JukeboxStateType.RequestSong;
+                            break;
+                        }
+
+                        if ((bool)isRightSong)
                         {
                             selectedSong = song.FullPath;
                             JukeboxState = JukeboxStateType.PlaySong;

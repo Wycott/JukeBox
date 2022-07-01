@@ -18,7 +18,7 @@ public static class Display
         WriteColourText(data, ConsoleColor.DarkYellow);
     }
 
-    public static bool IsThisTheRightSong(string candidate)
+    public static bool? IsThisTheRightSong(string candidate)
     {
         Console.Write("Found: ");
         WriteYellowText(candidate);
@@ -26,7 +26,12 @@ public static class Display
         var cki = Console.ReadKey();
         Console.WriteLine();
 
-        return (cki.Key == ConsoleKey.Y);
+        return cki.Key switch
+        {
+            ConsoleKey.Y => true,
+            ConsoleKey.N => false,
+            _ => null
+        };
     }
 
     public static void WriteError(string errorMessage)
