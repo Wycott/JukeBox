@@ -22,8 +22,8 @@ public static class FileSystemParser
                     {
                         if (ExtensionsOk(possibleSongFile))
                         {
-
-                            retVal.Add(new Song() { FullPath = possibleSongFile });
+                            var shortPath = possibleSongFile.Replace(drive, "");
+                            retVal.Add(new Song() { FullPath = possibleSongFile, ShortenedPath = shortPath });
                         }
                     }
                 }
