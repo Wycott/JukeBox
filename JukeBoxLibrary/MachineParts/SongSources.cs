@@ -17,6 +17,7 @@ public class SongSources : ISongSources
         Sources = new List<string>()
         {
             @"E:\iTunes Music\",
+            @"D:\iTunes Music\",
             @"D:\Program Files (x86)\Origin Games\The Sims 4\",
             @"C:\Users\rober\Music\"
         };
