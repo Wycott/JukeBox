@@ -14,7 +14,7 @@ public static class FileSystemParser
 
         foreach (var drive in mediaDrives.Sources)
         {
-            string[]? directories = null;
+            string[]? directories;
             try
             {
                 directories = Directory.GetDirectories(drive);
