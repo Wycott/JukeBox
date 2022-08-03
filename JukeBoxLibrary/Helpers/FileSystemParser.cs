@@ -14,7 +14,17 @@ public static class FileSystemParser
 
         foreach (var drive in mediaDrives.Sources)
         {
-            foreach (var possibleSongDirectory in Directory.GetDirectories(drive))
+            string[]? directories = null;
+            try
+            {
+                directories = Directory.GetDirectories(drive);
+            }
+            catch (DirectoryNotFoundException)
+            {
+                continue;
+            }
+
+            foreach (var possibleSongDirectory in directories)
             {
                 try
                 {
