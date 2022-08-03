@@ -5,12 +5,12 @@ public static class Display
 {
     public static void FlowerBox()
     {
-        var c = ForegroundColor;
+        var currentConsoleColour = ForegroundColor;
         ForegroundColor = ConsoleColor.White;
 
         WriteText();
 
-        ForegroundColor = c;
+        ForegroundColor = currentConsoleColour;
     }
 
     public static void WriteYellowText(string data)
@@ -23,10 +23,10 @@ public static class Display
         Write("Found: ");
         WriteYellowText(candidate);
         Write("Play y/n? ");
-        var cki = ReadKey();
+        var consoleInput = ReadKey();
         WriteLine();
 
-        return cki.Key switch
+        return consoleInput.Key switch
         {
             ConsoleKey.Y => true,
             ConsoleKey.N => false,
@@ -42,10 +42,10 @@ public static class Display
 
     private static void WriteColourText(string data, ConsoleColor colour)
     {
-        var c = ForegroundColor;
+        var currentConsoleColour = ForegroundColor;
         ForegroundColor = colour;
         WriteLine(data);
-        ForegroundColor = c;
+        ForegroundColor = currentConsoleColour;
     }
 
     private static void WriteText()
@@ -65,14 +65,14 @@ public static class Display
 
     private static void WriteLines(IEnumerable<string> data)
     {
-        foreach (var s in data)
+        foreach (var line in data)
         {
-            Write(s);
+            Write(line);
         }
     }
 
-    private static void Write(string s)
+    private static void Write(string line)
     {
-        WriteLine(s);
+        WriteLine(line);
     }
 }
