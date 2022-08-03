@@ -1,16 +1,16 @@
-﻿// TODO: Static to reduce noise
+﻿using static System.Console;
 namespace JukeboxLibrary.Helpers;
 
 public static class Display
 {
     public static void FlowerBox()
     {
-        var c = Console.ForegroundColor;
-        Console.ForegroundColor = ConsoleColor.White;
+        var c = ForegroundColor;
+        ForegroundColor = ConsoleColor.White;
 
         WriteText();
 
-        Console.ForegroundColor = c;
+        ForegroundColor = c;
     }
 
     public static void WriteYellowText(string data)
@@ -20,11 +20,11 @@ public static class Display
 
     public static bool? IsThisTheRightSong(string candidate)
     {
-        Console.Write("Found: ");
+        Write("Found: ");
         WriteYellowText(candidate);
-        Console.Write("Play y/n? ");
-        var cki = Console.ReadKey();
-        Console.WriteLine();
+        Write("Play y/n? ");
+        var cki = ReadKey();
+        WriteLine();
 
         return cki.Key switch
         {
@@ -37,15 +37,15 @@ public static class Display
     public static void WriteError(string errorMessage)
     {
         WriteColourText(errorMessage, ConsoleColor.Red);
-        Console.WriteLine();
+        WriteLine();
     }
 
     private static void WriteColourText(string data, ConsoleColor colour)
     {
-        var c = Console.ForegroundColor;
-        Console.ForegroundColor = colour;
-        Console.WriteLine(data);
-        Console.ForegroundColor = c;
+        var c = ForegroundColor;
+        ForegroundColor = colour;
+        WriteLine(data);
+        ForegroundColor = c;
     }
 
     private static void WriteText()
@@ -73,6 +73,6 @@ public static class Display
 
     private static void Write(string s)
     {
-        Console.WriteLine(s);
+        WriteLine(s);
     }
 }
