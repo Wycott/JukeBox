@@ -3,14 +3,27 @@ namespace JukeboxLibrary.Helpers;
 
 public static class Display
 {
+    private static int currentColour;
+
+    // Yes, could have enumerated console colours but some of them aren't very bright
+    private static readonly List<ConsoleColor> BrightColours = new()
+    {
+        ConsoleColor.Blue,
+        ConsoleColor.Green,
+        ConsoleColor.Cyan,
+        ConsoleColor.Red,
+        ConsoleColor.Magenta,
+        ConsoleColor.Yellow,
+        ConsoleColor.White
+    };
+
     public static void FlowerBox()
     {
-        var currentConsoleColour = ForegroundColor;
         ForegroundColor = ConsoleColor.White;
 
         WriteText();
 
-        ForegroundColor = currentConsoleColour;
+        Console.ResetColor();
     }
 
     public static void WriteYellowText(string data)
@@ -60,19 +73,38 @@ public static class Display
             ""
         };
 
-        WriteLines(lines);
+        WriteLines(lines, colouredText: true);
     }
 
-    private static void WriteLines(IEnumerable<string> data)
+    private static void WriteLines(IEnumerable<string> data, bool colouredText = false)
     {
         foreach (var line in data)
         {
-            Write(line);
+            Write(line, colouredText);
         }
     }
 
-    private static void Write(string line)
+    private static void Write(string line, bool colouredText = false)
     {
-        WriteLine(line);
+        if (!colouredText)
+        {
+            WriteLine(line);
+
+            return;
+        }
+
+        foreach (var c in line)
+        {
+            var printString = c.ToString();
+            ForegroundColor = BrightColours[currentColour];
+            Console.Write(c.ToString());
+
+            if (printString != " ")
+                currentColour++;
+
+            if (currentColour == BrightColours.ToList().Count) currentColour = 0;
+        }
+
+        WriteLine();
     }
 }
