@@ -31,11 +31,13 @@ public class SongPlayer : ISongPlayer
 
     private void CheckForPlayingSong()
     {
-        if (SongPlaying && Player != null)
+        if (!SongPlaying || Player == null)
         {
-            Player.Stop();
-            // TODO: Dispose too probably
-            SongPlaying = false;
+            return;
         }
+
+        Player.Stop();
+        // TODO: Dispose too probably
+        SongPlaying = false;
     }
 }

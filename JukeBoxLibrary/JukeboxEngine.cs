@@ -67,7 +67,7 @@ public class JukeboxEngine : IJukeboxEngine
                 case JukeboxStateType.SelectVersion:
                     foreach (var song in SongList.SongCollection)
                     {
-                        bool? isRightSong = Display.IsThisTheRightSong(song.ShortenedPath);
+                        var isRightSong = Display.IsThisTheRightSong(song.ShortenedPath);
 
                         if (isRightSong == null)
                         {
@@ -75,12 +75,14 @@ public class JukeboxEngine : IJukeboxEngine
                             break;
                         }
 
-                        if ((bool)isRightSong)
+                        if (!(bool)isRightSong)
                         {
-                            selectedSong = song.FullPath;
-                            JukeboxState = JukeboxStateType.PlaySong;
-                            break;
+                            continue;
                         }
+
+                        selectedSong = song.FullPath;
+                        JukeboxState = JukeboxStateType.PlaySong;
+                        break;
                     }
                     if (JukeboxState != JukeboxStateType.PlaySong)
                     {

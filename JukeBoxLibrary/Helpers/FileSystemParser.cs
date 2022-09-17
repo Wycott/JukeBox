@@ -10,7 +10,7 @@ public static class FileSystemParser
         var retVal = new List<ISong>();
         var artist = GetArtist(huntString);
 
-        bool haveArtist = artist.Length > 0;
+        var haveArtist = artist.Length > 0;
 
         // TODO: Maybe do this elsewhere
         huntString = artist.Length > 0 ? "*" : PreparePattern(huntString);
@@ -50,12 +50,7 @@ public static class FileSystemParser
             }
         }
 
-        if (haveArtist)
-        {
-            return retVal.OrderBy(g => Guid.NewGuid()).ToList();
-        }
-
-        return retVal;
+        return haveArtist ? retVal.OrderBy(_ => Guid.NewGuid()).ToList() : retVal;
     }
 
     private static bool ExtensionsOk(string candidate)
@@ -81,6 +76,7 @@ public static class FileSystemParser
     private static string GetArtist(string initialPattern)
     {
         const string BandMarker = "@";
+
         if (!initialPattern.Contains(BandMarker))
         {
             return string.Empty;
