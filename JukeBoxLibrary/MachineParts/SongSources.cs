@@ -1,4 +1,5 @@
-﻿using JukeboxLibrary.Interfaces;
+﻿
+using JukeboxLibrary.Interfaces;
 
 namespace JukeboxLibrary.MachineParts;
 
