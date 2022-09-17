@@ -64,12 +64,13 @@ public static class Display
     private static void WriteText()
     {
         var lines = new List<string> {
-            "************************************",
-            "*                                  *",
-            "*   Robbie Dee's Console Jukebox   *",
-            "*  © 2014-2022 Rogedo Consultants  *",
-            "*                                  *",
-            "************************************",
+            "",
+            " ************************************",
+            " *                                  *",
+            " *   Robbie Dee's Console Jukebox   *",
+            " *  © 2014-2022 Rogedo Consultants  *",
+            " *                                  *",
+            " ************************************",
             ""
         };
 
