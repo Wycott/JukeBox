@@ -10,8 +10,6 @@ public class JukeboxEngine : IJukeboxEngine
     public ISongList SongList { get; }
     public ISongPlayer SongPlayer { get; }
 
-    private JukeboxStateType JukeboxState { get; set; } = JukeboxStateType.Unknown;
-
     public JukeboxEngine(ISongSources songSources, ISongList songList, ISongPlayer songPlayer)
     {
         SongSources = songSources;
@@ -21,7 +19,6 @@ public class JukeboxEngine : IJukeboxEngine
 
     public void Start()
     {
-        JukeboxState = JukeboxStateType.ShowTitleBox;
         LetTheMusicPlay();
     }
 
@@ -30,22 +27,22 @@ public class JukeboxEngine : IJukeboxEngine
         var selectedPattern = string.Empty;
         var selectedSong = string.Empty;
 
+        var jukeboxState = JukeboxStateType.ShowTitleBox;
+
         while (true)
         {
-            switch (JukeboxState)
+            switch (jukeboxState)
             {
-                case JukeboxStateType.Unknown:
-                    break;
                 case JukeboxStateType.ShowTitleBox:
                     Display.FlowerBox();
-                    JukeboxState = JukeboxStateType.RequestSong;
+                    jukeboxState = JukeboxStateType.RequestSong;
                     break;
                 case JukeboxStateType.RequestSong:
                     Console.Write("Enter pattern: ");
                     selectedPattern = Console.ReadLine();
                     if (!string.IsNullOrWhiteSpace(selectedPattern))
                     {
-                        JukeboxState = JukeboxStateType.FindSong;
+                        jukeboxState = JukeboxStateType.FindSong;
                     }
                     break;
                 case JukeboxStateType.FindSong:
@@ -56,12 +53,12 @@ public class JukeboxEngine : IJukeboxEngine
 
                     if (SongList.SongCollection.Count > 0)
                     {
-                        JukeboxState = JukeboxStateType.SelectVersion;
+                        jukeboxState = JukeboxStateType.SelectVersion;
                     }
                     else
                     {
                         Display.WriteError("Not Found!");
-                        JukeboxState = JukeboxStateType.RequestSong;
+                        jukeboxState = JukeboxStateType.RequestSong;
                     }
                     break;
                 case JukeboxStateType.SelectVersion:
@@ -71,7 +68,7 @@ public class JukeboxEngine : IJukeboxEngine
 
                         if (isRightSong == null)
                         {
-                            JukeboxState = JukeboxStateType.RequestSong;
+                            jukeboxState = JukeboxStateType.RequestSong;
                             break;
                         }
 
@@ -81,19 +78,20 @@ public class JukeboxEngine : IJukeboxEngine
                         }
 
                         selectedSong = song.FullPath;
-                        JukeboxState = JukeboxStateType.PlaySong;
+                        jukeboxState = JukeboxStateType.PlaySong;
                         break;
                     }
-                    if (JukeboxState != JukeboxStateType.PlaySong)
+                    if (jukeboxState != JukeboxStateType.PlaySong)
                     {
                         Display.WriteError("Nothing selected!");
-                        JukeboxState = JukeboxStateType.RequestSong;
+                        jukeboxState = JukeboxStateType.RequestSong;
                     }
                     break;
                 case JukeboxStateType.PlaySong:
                     SongPlayer.PlaySong(selectedSong);
-                    JukeboxState = JukeboxStateType.RequestSong;
+                    jukeboxState = JukeboxStateType.RequestSong;
                     break;
+                case JukeboxStateType.Unknown:
                 default:
                     throw new ArgumentOutOfRangeException();
             }
