@@ -81,11 +81,9 @@ public static class FileSystemParser
         {
             return string.Empty;
         }
-        else
-        {
-            var parts = initialPattern.Split(BandMarker);
-            return parts[1];
-        }
+
+        var parts = initialPattern.Split(BandMarker);
+        return parts[1];
     }
 
     private static bool HaveASongByThisArtist(string songPattern, string artist)
