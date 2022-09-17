@@ -18,8 +18,16 @@ N.B. the patterns have to be in order. This wouldn't match:
 
 >pra ivi
 
+## Play Any Song By Artist
+
+If you just want to play a song by given artist you can use a wild card followed by the artist name stub separated by @ so this:
+
+>*@Jovi
+
+Would match  any song by Bon Jovi. N.B. the results returned each time are randomised.
+
 ## History
 
 The original version of this program was written in 2014.
 
-_Last updated: 30 June 2022_
+_Last updated: 17 September 2022_
