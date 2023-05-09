@@ -74,7 +74,7 @@ public class Display : IDisplay
 			" ************************************",
 			" *                                  *",
 			" *   Robbie Dee's Console Jukebox   *",
-			" *  © 2014-2022 Rogedo Consultants  *",
+			" *  © 2014-2023 Rogedo Consultants  *",
 			" *                                  *",
 			" ************************************",
 			""
