@@ -8,7 +8,6 @@ namespace Jukebox;
 
 internal static class Program
 {
-	// TODO : DI
 	private static void Main()
 	{
 		var serviceProvider = new ServiceCollection()
@@ -23,6 +22,5 @@ internal static class Program
 		var engine = serviceProvider.GetService<IJukeboxEngine>();
 
 		engine?.Start();
-
 	}
 }

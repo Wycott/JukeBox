@@ -83,6 +83,7 @@ public static class FileSystemParser
         }
 
         var parts = initialPattern.Split(BandMarker);
+
         return parts[1];
     }
 

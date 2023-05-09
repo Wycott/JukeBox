@@ -1,5 +1,4 @@
 ﻿using JukeboxLibrary.Interfaces;
-//using static System.Console;
 namespace JukeboxLibrary.Helpers;
 
 public class Display : IDisplay
