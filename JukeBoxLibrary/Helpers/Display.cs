@@ -1,111 +1,118 @@
-﻿using static System.Console;
+﻿using JukeboxLibrary.Interfaces;
+//using static System.Console;
 namespace JukeboxLibrary.Helpers;
 
-public static class Display
+public class Display : IDisplay
 {
-    private static int currentColour;
+	private IConsoleEngine ConsoleEngine { get; set; }
 
-    // Yes, could have enumerated console colours but some of them aren't very bright
-    private static readonly List<ConsoleColor> BrightColours = new()
-    {
-        ConsoleColor.Blue,
-        ConsoleColor.Green,
-        ConsoleColor.Cyan,
-        ConsoleColor.Red,
-        ConsoleColor.Magenta,
-        ConsoleColor.Yellow,
-        ConsoleColor.White
-    };
+	public Display(IConsoleEngine consoleEngine)
+	{
+		ConsoleEngine = consoleEngine;
+	}
+	private static int currentColour;
 
-    public static void FlowerBox()
-    {
-        ForegroundColor = ConsoleColor.White;
+	// Yes, could have enumerated console colours but some of them aren't very bright
+	private static readonly List<ConsoleColor> BrightColours = new()
+	{
+		ConsoleColor.Blue,
+		ConsoleColor.Green,
+		ConsoleColor.Cyan,
+		ConsoleColor.Red,
+		ConsoleColor.Magenta,
+		ConsoleColor.Yellow,
+		ConsoleColor.White
+	};
 
-        WriteText();
+	public void FlowerBox()
+	{
+		ConsoleEngine.TextColour = ConsoleColor.White;
 
-        Console.ResetColor();
-    }
+		WriteText();
 
-    public static void WriteYellowText(string data)
-    {
-        WriteColourText(data, ConsoleColor.DarkYellow);
-    }
+		Console.ResetColor();
+	}
 
-    public static bool? IsThisTheRightSong(string candidate)
-    {
-        Write("Found: ");
-        WriteYellowText(candidate);
-        Write("Play y/n? ");
-        var consoleInput = ReadKey();
-        WriteLine();
+	public void WriteYellowText(string data)
+	{
+		WriteColourText(data, ConsoleColor.DarkYellow);
+	}
 
-        return consoleInput.Key switch
-        {
-            ConsoleKey.Y => true,
-            ConsoleKey.N => false,
-            _ => null
-        };
-    }
+	public bool? IsThisTheRightSong(string candidate)
+	{
+		Write("Found: ");
+		WriteYellowText(candidate);
+		Write("Play y/n? ");
+		var consoleInput = ConsoleEngine.ReadAKey();
+		ConsoleEngine.WriteALine();
 
-    public static void WriteError(string errorMessage)
-    {
-        WriteColourText(errorMessage, ConsoleColor.Red);
-        WriteLine();
-    }
+		return consoleInput.Key switch
+		{
+			ConsoleKey.Y => true,
+			ConsoleKey.N => false,
+			_ => null
+		};
+	}
 
-    private static void WriteColourText(string data, ConsoleColor colour)
-    {
-        var currentConsoleColour = ForegroundColor;
-        ForegroundColor = colour;
-        WriteLine(data);
-        ForegroundColor = currentConsoleColour;
-    }
+	public void WriteError(string errorMessage)
+	{
+		WriteColourText(errorMessage, ConsoleColor.Red);
+		ConsoleEngine.WriteALine();
+	}
 
-    private static void WriteText()
-    {
-        var lines = new List<string> {
-            "",
-            " ************************************",
-            " *                                  *",
-            " *   Robbie Dee's Console Jukebox   *",
-            " *  © 2014-2022 Rogedo Consultants  *",
-            " *                                  *",
-            " ************************************",
-            ""
-        };
+	private void WriteColourText(string data, ConsoleColor colour)
+	{
+		var currentConsoleColour = ConsoleEngine.TextColour;
+		ConsoleEngine.TextColour = colour;
+		ConsoleEngine.WriteALine(data);
+		ConsoleEngine.TextColour = currentConsoleColour;
+	}
 
-        WriteLines(lines, colouredText: true);
-    }
+	private void WriteText()
+	{
+		var lines = new List<string> {
+			"",
+			" ************************************",
+			" *                                  *",
+			" *   Robbie Dee's Console Jukebox   *",
+			" *  © 2014-2022 Rogedo Consultants  *",
+			" *                                  *",
+			" ************************************",
+			""
+		};
 
-    private static void WriteLines(IEnumerable<string> data, bool colouredText = false)
-    {
-        foreach (var line in data)
-        {
-            Write(line, colouredText);
-        }
-    }
+		WriteLines(lines, colouredText: true);
+	}
 
-    private static void Write(string line, bool colouredText = false)
-    {
-        if (!colouredText)
-        {
-            WriteLine(line);
+	private void WriteLines(IEnumerable<string> data, bool colouredText = false)
+	{
+		foreach (var line in data)
+		{
+			Write(line, colouredText);
+		}
+	}
 
-            return;
-        }
+	private void Write(string line, bool colouredText = false)
+	{
+		if (!colouredText)
+		{
+			ConsoleEngine.WriteALine(line);
 
-        foreach (var c in line)
-        {
-            var printString = c.ToString();
-            ForegroundColor = BrightColours[currentColour];
-            Console.Write(c.ToString());
+			return;
+		}
 
-            if (printString != " ")
-                currentColour++;
+		foreach (var c in line)
+		{
+			var printString = c.ToString();
+			ConsoleEngine.TextColour = BrightColours[currentColour];
+			ConsoleEngine.WriteText(c.ToString());
 
-            if (currentColour == BrightColours.ToList().Count) currentColour = 0;
-        }
+			if (printString != " ")
+				currentColour++;
 
-        WriteLine();
-    }
+			if (currentColour == BrightColours.ToList().Count) currentColour = 0;
+		}
+
+		ConsoleEngine.WriteALine();
+	}
 }

@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jukebox", "JukeBox\Jukebox.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JukeboxLibrary", "JukeBoxLibrary\JukeboxLibrary.csproj", "{2C3688FE-AC41-458E-A9D9-38A466F539E2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JukeboxLibrary.Test", "JukeboxLibrary.Test\JukeboxLibrary.Test.csproj", "{554101E1-2EB6-4596-9457-A8D2E9E1B180}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{2C3688FE-AC41-458E-A9D9-38A466F539E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C3688FE-AC41-458E-A9D9-38A466F539E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2C3688FE-AC41-458E-A9D9-38A466F539E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{554101E1-2EB6-4596-9457-A8D2E9E1B180}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{554101E1-2EB6-4596-9457-A8D2E9E1B180}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{554101E1-2EB6-4596-9457-A8D2E9E1B180}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{554101E1-2EB6-4596-9457-A8D2E9E1B180}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -9,12 +9,14 @@ public class JukeboxEngine : IJukeboxEngine
     public ISongSources SongSources { get; }
     public ISongList SongList { get; }
     public ISongPlayer SongPlayer { get; }
+    public IDisplay DisplayEngine { get; }
 
-    public JukeboxEngine(ISongSources songSources, ISongList songList, ISongPlayer songPlayer)
+    public JukeboxEngine(ISongSources songSources, ISongList songList, ISongPlayer songPlayer, IDisplay displayEngine)
     {
         SongSources = songSources;
         SongList = songList;
         SongPlayer = songPlayer;
+        DisplayEngine = displayEngine;
     }
 
     public void Start()
@@ -34,7 +36,7 @@ public class JukeboxEngine : IJukeboxEngine
             switch (jukeboxState)
             {
                 case JukeboxStateType.ShowTitleBox:
-                    Display.FlowerBox();
+	                DisplayEngine.FlowerBox();
                     jukeboxState = JukeboxStateType.RequestSong;
                     break;
                 case JukeboxStateType.RequestSong:
@@ -57,14 +59,14 @@ public class JukeboxEngine : IJukeboxEngine
                     }
                     else
                     {
-                        Display.WriteError("Not Found!");
+	                    DisplayEngine.WriteError("Not Found!");
                         jukeboxState = JukeboxStateType.RequestSong;
                     }
                     break;
                 case JukeboxStateType.SelectVersion:
                     foreach (var song in SongList.SongCollection)
                     {
-                        var isRightSong = Display.IsThisTheRightSong(song.ShortenedPath);
+                        var isRightSong = DisplayEngine.IsThisTheRightSong(song.ShortenedPath);
 
                         if (isRightSong == null)
                         {
@@ -83,7 +85,7 @@ public class JukeboxEngine : IJukeboxEngine
                     }
                     if (jukeboxState != JukeboxStateType.PlaySong)
                     {
-                        Display.WriteError("Nothing selected!");
+	                    DisplayEngine.WriteError("Nothing selected!");
                         jukeboxState = JukeboxStateType.RequestSong;
                     }
                     break;

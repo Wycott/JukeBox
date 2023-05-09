@@ -88,7 +88,7 @@ public static class FileSystemParser
 
     private static bool HaveASongByThisArtist(string songPattern, string artist)
     {
-        var nonSongSection = songPattern.Substring(0, songPattern.LastIndexOf("\\", StringComparison.Ordinal));
+        var nonSongSection = songPattern[..songPattern.LastIndexOf("\\", StringComparison.Ordinal)];
 
         return nonSongSection.ToUpper().Contains(artist.ToUpper());
     }

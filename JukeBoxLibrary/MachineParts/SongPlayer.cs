@@ -12,6 +12,13 @@ public class SongPlayer : ISongPlayer
     // TODO: Might be able to interrogate the various objects but surely this is easier
     private bool SongPlaying { get; set; }
 
+    private IDisplay DisplayEngine { get; }
+
+	public SongPlayer(IDisplay displayEngine)
+    {
+        DisplayEngine = displayEngine;
+    }
+
     public void PlaySong(string filename)
     {
         try
@@ -25,7 +32,7 @@ public class SongPlayer : ISongPlayer
         }
         catch (InvalidOperationException)
         {
-            Display.WriteError("Internal error - please pick another song");
+	        DisplayEngine.WriteError("Internal error - please pick another song");
         }
     }
 
