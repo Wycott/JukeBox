@@ -3,7 +3,7 @@ namespace JukeboxLibrary.Helpers;
 
 public class Display : IDisplay
 {
-	private IConsoleEngine ConsoleEngine { get; set; }
+	private IConsoleEngine ConsoleEngine { get; }
 
 	public Display(IConsoleEngine consoleEngine)
 	{
@@ -74,7 +74,7 @@ public class Display : IDisplay
 			" ************************************",
 			" *                                  *",
 			" *   Robbie Dee's Console Jukebox   *",
-			" *  © 2014-2023 Rogedo Consultants  *",
+			" *  © 2014-2024 Rogedo Consultants  *",
 			" *                                  *",
 			" ************************************",
 			""

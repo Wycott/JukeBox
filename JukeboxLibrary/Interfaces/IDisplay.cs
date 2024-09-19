@@ -1,13 +1,12 @@
-﻿namespace JukeboxLibrary.Interfaces
+﻿namespace JukeboxLibrary.Interfaces;
+
+public interface IDisplay
 {
-	public interface IDisplay
-	{
-		void FlowerBox();
+    void FlowerBox();
 
-		void WriteYellowText(string data);
+    void WriteYellowText(string data);
 
-		bool? IsThisTheRightSong(string candidate);
+    bool? IsThisTheRightSong(string candidate);
 
-		void WriteError(string errorMessage);
-	}
+    void WriteError(string errorMessage);
 }

@@ -1,34 +1,33 @@
 ﻿using JukeboxLibrary.Interfaces;
 
-namespace JukeboxLibrary.Helpers
+namespace JukeboxLibrary.Helpers;
+
+public class ConsoleEngine : IConsoleEngine
 {
-	public class ConsoleEngine : IConsoleEngine
-	{
-		public void WriteALine(string text)
-		{
-			Console.WriteLine(text);
-		}
+    public void WriteALine(string text)
+    {
+        Console.WriteLine(text);
+    }
 
-		public void WriteALine()
-		{
-			Console.WriteLine();
-		}
+    public void WriteALine()
+    {
+        Console.WriteLine();
+    }
 
-		public void WriteText(string text)
-		{
-			Console.Write(text);
-		}
+    public void WriteText(string text)
+    {
+        Console.Write(text);
+    }
 
-		public ConsoleKeyInfo ReadAKey()
-		{
-			return Console.ReadKey();
-		}
+    public ConsoleKeyInfo ReadAKey()
+    {
+        return Console.ReadKey();
+    }
 
-		public ConsoleColor TextColour
-		{
-			get => Console.ForegroundColor;
+    public ConsoleColor TextColour
+    {
+        get => Console.ForegroundColor;
 
-			set => Console.ForegroundColor = value;
-		}
-	}
+        set => Console.ForegroundColor = value;
+    }
 }
