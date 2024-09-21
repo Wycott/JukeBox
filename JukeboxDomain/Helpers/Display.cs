@@ -1,5 +1,6 @@
-﻿using JukeboxLibrary.Interfaces;
-namespace JukeboxLibrary.Helpers;
+﻿using JukeboxInterfaces;
+
+namespace JukeboxDomain.Helpers;
 
 public class Display : IDisplay
 {

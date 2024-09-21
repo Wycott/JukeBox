@@ -1,5 +1,5 @@
-﻿using JukeboxLibrary.Helpers;
-using JukeboxLibrary.Interfaces;
+﻿using JukeboxDomain.Helpers;
+using JukeboxInterfaces;
 using Moq;
 
 namespace JukeboxLibrary.Test.Helpers;

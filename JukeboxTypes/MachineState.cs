@@ -1,4 +1,4 @@
-﻿namespace JukeboxLibrary.Types;
+﻿namespace JukeboxTypes;
 
 public enum JukeboxStateType
 {

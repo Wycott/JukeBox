@@ -1,6 +1,6 @@
-﻿using JukeboxLibrary.Interfaces;
+﻿using JukeboxInterfaces;
 
-namespace JukeboxLibrary.MachineParts;
+namespace JukeboxDomain;
 
 public class Song : ISong
 {

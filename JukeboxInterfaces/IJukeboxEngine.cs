@@ -1,4 +1,4 @@
-﻿namespace JukeboxLibrary.Interfaces;
+﻿namespace JukeboxInterfaces;
 
 public interface IJukeboxEngine
 {

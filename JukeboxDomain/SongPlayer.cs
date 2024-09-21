@@ -1,7 +1,7 @@
-﻿using JukeboxLibrary.Interfaces;
+﻿using JukeboxInterfaces;
 using NAudio.Wave;
 
-namespace JukeboxLibrary.MachineParts;
+namespace JukeboxDomain;
 
 public class SongPlayer : ISongPlayer
 {

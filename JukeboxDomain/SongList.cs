@@ -1,7 +1,7 @@
-﻿using JukeboxLibrary.Helpers;
-using JukeboxLibrary.Interfaces;
+﻿using JukeboxDomain.Helpers;
+using JukeboxInterfaces;
 
-namespace JukeboxLibrary.MachineParts;
+namespace JukeboxDomain;
 
 public class SongList : ISongList
 {

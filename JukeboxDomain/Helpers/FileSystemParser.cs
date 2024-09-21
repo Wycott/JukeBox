@@ -1,7 +1,6 @@
-﻿using JukeboxLibrary.Interfaces;
-using JukeboxLibrary.MachineParts;
+﻿using JukeboxInterfaces;
 
-namespace JukeboxLibrary.Helpers;
+namespace JukeboxDomain.Helpers;
 
 public static class FileSystemParser
 {

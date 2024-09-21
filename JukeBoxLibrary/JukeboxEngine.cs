@@ -1,5 +1,5 @@
-﻿using JukeboxLibrary.Types;
-using JukeboxLibrary.Interfaces;
+﻿using JukeboxInterfaces;
+using JukeboxTypes;
 
 namespace JukeboxLibrary;
 

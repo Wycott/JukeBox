@@ -1,7 +1,7 @@
-﻿using JukeboxLibrary;
-using JukeboxLibrary.Helpers;
-using JukeboxLibrary.Interfaces;
-using JukeboxLibrary.MachineParts;
+﻿using JukeboxDomain;
+using JukeboxDomain.Helpers;
+using JukeboxInterfaces;
+using JukeboxLibrary;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Jukebox;

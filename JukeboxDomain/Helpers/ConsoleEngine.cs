@@ -1,6 +1,6 @@
-﻿using JukeboxLibrary.Interfaces;
+﻿using JukeboxInterfaces;
 
-namespace JukeboxLibrary.Helpers;
+namespace JukeboxDomain.Helpers;
 
 public class ConsoleEngine : IConsoleEngine
 {
