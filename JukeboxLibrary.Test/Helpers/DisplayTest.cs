@@ -13,7 +13,7 @@ public class DisplayTest
         const int ExpectedCharactersWritten = 222;
         var consoleEngineMock = new Mock<IConsoleEngine>();
         var displayEngine = new Display(consoleEngineMock.Object);
-			
+
         // Act
         displayEngine.FlowerBox();
 

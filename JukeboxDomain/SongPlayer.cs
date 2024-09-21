@@ -13,7 +13,7 @@ public class SongPlayer : ISongPlayer
 
     private IDisplay DisplayEngine { get; }
 
-	public SongPlayer(IDisplay displayEngine)
+    public SongPlayer(IDisplay displayEngine)
     {
         DisplayEngine = displayEngine;
     }
@@ -31,7 +31,7 @@ public class SongPlayer : ISongPlayer
         }
         catch (InvalidOperationException)
         {
-	        DisplayEngine.WriteError("Internal error - please pick another song");
+            DisplayEngine.WriteError("Internal error - please pick another song");
         }
     }
 
