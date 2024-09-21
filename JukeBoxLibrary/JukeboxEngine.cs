@@ -65,7 +65,7 @@ public class JukeboxEngine : IJukeboxEngine
 
     private JukeboxStateType SelectVersion(JukeboxStateType jukeboxState, out string selectedSong)
     {
-        selectedSong = String.Empty;
+        selectedSong = string.Empty;
 
         foreach (var song in SongList.SongCollection)
         {
