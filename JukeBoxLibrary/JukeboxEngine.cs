@@ -35,67 +35,108 @@ public class JukeboxEngine : IJukeboxEngine
             switch (jukeboxState)
             {
                 case JukeboxStateType.ShowTitleBox:
-	                DisplayEngine.FlowerBox();
-                    jukeboxState = JukeboxStateType.RequestSong;
+	                jukeboxState = ShowTitleBox();
                     break;
                 case JukeboxStateType.RequestSong:
-                    Console.Write("Enter pattern: ");
-                    selectedPattern = Console.ReadLine();
-                    if (!string.IsNullOrWhiteSpace(selectedPattern))
-                    {
-                        jukeboxState = JukeboxStateType.FindSong;
-                    }
+                    jukeboxState = RequestSong(jukeboxState, out selectedPattern);
                     break;
                 case JukeboxStateType.FindSong:
-                    if (selectedPattern != null)
-                    {
-                        SongList.Build(SongSources, selectedPattern);
-                    }
-
-                    if (SongList.SongCollection.Count > 0)
-                    {
-                        jukeboxState = JukeboxStateType.SelectVersion;
-                    }
-                    else
-                    {
-	                    DisplayEngine.WriteError("Not Found!");
-                        jukeboxState = JukeboxStateType.RequestSong;
-                    }
+                    jukeboxState = FindSong(selectedPattern);
                     break;
                 case JukeboxStateType.SelectVersion:
-                    foreach (var song in SongList.SongCollection)
-                    {
-                        var isRightSong = DisplayEngine.IsThisTheRightSong(song.ShortenedPath);
-
-                        if (isRightSong == null)
-                        {
-                            jukeboxState = JukeboxStateType.RequestSong;
-                            break;
-                        }
-
-                        if (!(bool)isRightSong)
-                        {
-                            continue;
-                        }
-
-                        selectedSong = song.FullPath;
-                        jukeboxState = JukeboxStateType.PlaySong;
-                        break;
-                    }
-                    if (jukeboxState != JukeboxStateType.PlaySong)
-                    {
-	                    DisplayEngine.WriteError("Nothing selected!");
-                        jukeboxState = JukeboxStateType.RequestSong;
-                    }
+                    jukeboxState = SelectVersion(jukeboxState, out selectedSong);
                     break;
                 case JukeboxStateType.PlaySong:
-                    SongPlayer.PlaySong(selectedSong);
-                    jukeboxState = JukeboxStateType.RequestSong;
+                    jukeboxState = PlaySong(selectedSong);
                     break;
                 case JukeboxStateType.Unknown:
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
+    }
+
+    private JukeboxStateType PlaySong(string selectedSong)
+    {
+        SongPlayer.PlaySong(selectedSong);
+        
+        return JukeboxStateType.RequestSong;
+    }
+
+    private JukeboxStateType SelectVersion(JukeboxStateType jukeboxState, out string selectedSong)
+    {
+        selectedSong = String.Empty;
+
+        foreach (var song in SongList.SongCollection)
+        {
+            var isRightSong = DisplayEngine.IsThisTheRightSong(song.ShortenedPath);
+
+            if (isRightSong == null)
+            {
+                jukeboxState = JukeboxStateType.RequestSong;
+                break;
+            }
+
+            if (!(bool)isRightSong)
+            {
+                continue;
+            }
+
+            selectedSong = song.FullPath;
+            jukeboxState = JukeboxStateType.PlaySong;
+            break;
+        }
+
+        if (jukeboxState == JukeboxStateType.PlaySong)
+        {
+            return jukeboxState;
+        }
+
+        DisplayEngine.WriteError("Nothing selected!");
+        jukeboxState = JukeboxStateType.RequestSong;
+
+        return jukeboxState;
+    }
+
+    private JukeboxStateType FindSong(string? selectedPattern)
+    {
+        JukeboxStateType jukeboxState;
+
+        if (selectedPattern != null)
+        {
+            SongList.Build(SongSources, selectedPattern);
+        }
+
+        if (SongList.SongCollection.Count > 0)
+        {
+            jukeboxState = JukeboxStateType.SelectVersion;
+        }
+        else
+        {
+            DisplayEngine.WriteError("Not Found!");
+            jukeboxState = JukeboxStateType.RequestSong;
+        }
+
+        return jukeboxState;
+    }
+
+    private static JukeboxStateType RequestSong(JukeboxStateType jukeboxState, out string? selectedPattern)
+    {
+        Console.Write("Enter pattern: ");
+        selectedPattern = Console.ReadLine();
+
+        if (!string.IsNullOrWhiteSpace(selectedPattern))
+        {
+            jukeboxState = JukeboxStateType.FindSong;
+        }
+
+        return jukeboxState;
+    }
+
+    private JukeboxStateType ShowTitleBox()
+    {
+        DisplayEngine.FlowerBox();
+
+        return JukeboxStateType.RequestSong;
     }
 }
