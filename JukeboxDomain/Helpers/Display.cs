@@ -30,7 +30,7 @@ public class Display : IDisplay
 
         WriteText();
 
-        Console.ResetColor();
+        ConsoleEngine.ResetColour();
     }
 
     public void WriteYellowText(string data)

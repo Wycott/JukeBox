@@ -1,17 +1,21 @@
-﻿using JukeboxInterfaces;
+﻿using System.Dynamic;
+using JukeboxDomain.Helpers;
+using JukeboxInterfaces;
 using JukeboxTypes;
 
 namespace JukeboxLibrary;
 
 public class JukeboxEngine : IJukeboxEngine
 {
+    private IConsoleEngine ConsoleEngine { get; }
     public ISongSources SongSources { get; }
     public ISongList SongList { get; }
     public ISongPlayer SongPlayer { get; }
     public IDisplay DisplayEngine { get; }
 
-    public JukeboxEngine(ISongSources songSources, ISongList songList, ISongPlayer songPlayer, IDisplay displayEngine)
+    public JukeboxEngine(ISongSources songSources, ISongList songList, ISongPlayer songPlayer, IDisplay displayEngine, IConsoleEngine consoleEngine)
     {
+        ConsoleEngine = consoleEngine;
         SongSources = songSources;
         SongList = songList;
         SongPlayer = songPlayer;
@@ -120,10 +124,10 @@ public class JukeboxEngine : IJukeboxEngine
         return jukeboxState;
     }
 
-    private static JukeboxStateType RequestSong(JukeboxStateType jukeboxState, out string? selectedPattern)
+    private JukeboxStateType RequestSong(JukeboxStateType jukeboxState, out string? selectedPattern)
     {
-        Console.Write("Enter pattern: ");
-        selectedPattern = Console.ReadLine();
+        ConsoleEngine.WriteText("Enter pattern: ");
+        selectedPattern = ConsoleEngine.ReadLine();
 
         if (!string.IsNullOrWhiteSpace(selectedPattern))
         {

@@ -9,6 +9,11 @@ public class ConsoleEngine : IConsoleEngine
         Console.WriteLine(text);
     }
 
+    public string? ReadLine()
+    {
+        return Console.ReadLine();
+    }
+
     public void WriteALine()
     {
         Console.WriteLine();
@@ -29,5 +34,10 @@ public class ConsoleEngine : IConsoleEngine
         get => Console.ForegroundColor;
 
         set => Console.ForegroundColor = value;
+    }
+
+    public void ResetColour()
+    {
+        Console.ResetColor();
     }
 }
