@@ -108,9 +108,14 @@ public class Display : IDisplay
             ConsoleEngine.WriteText(c.ToString());
 
             if (printString != " ")
+            {
                 currentColour++;
+            }
 
-            if (currentColour == BrightColours.ToList().Count) currentColour = 0;
+            if (currentColour == BrightColours.ToList().Count)
+            {
+                currentColour = 0;
+            }
         }
 
         ConsoleEngine.WriteALine();

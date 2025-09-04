@@ -1,6 +1,4 @@
-﻿using System.Dynamic;
-using JukeboxDomain.Helpers;
-using JukeboxInterfaces;
+﻿using JukeboxInterfaces;
 using JukeboxTypes;
 
 namespace JukeboxLibrary;
@@ -39,7 +37,7 @@ public class JukeboxEngine : IJukeboxEngine
             switch (jukeboxState)
             {
                 case JukeboxStateType.ShowTitleBox:
-	                jukeboxState = ShowTitleBox();
+                    jukeboxState = ShowTitleBox();
                     break;
                 case JukeboxStateType.RequestSong:
                     jukeboxState = RequestSong(jukeboxState, out selectedPattern);
@@ -63,7 +61,7 @@ public class JukeboxEngine : IJukeboxEngine
     private JukeboxStateType PlaySong(string selectedSong)
     {
         SongPlayer.PlaySong(selectedSong);
-        
+
         return JukeboxStateType.RequestSong;
     }
 

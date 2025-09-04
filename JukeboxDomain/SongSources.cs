@@ -1,5 +1,4 @@
-﻿
-using JukeboxInterfaces;
+﻿using JukeboxInterfaces;
 
 namespace JukeboxDomain;
 
