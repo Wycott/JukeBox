@@ -10,6 +10,7 @@ public class Display : IDisplay
     {
         ConsoleEngine = consoleEngine;
     }
+
     private static int currentColour;
 
     // Yes, could have enumerated console colours but some of them aren't very bright
