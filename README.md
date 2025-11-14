@@ -2,7 +2,7 @@
 
 <a href="https://docs.microsoft.com/en-us/dotnet/csharp/"><img src="https://raw.githubusercontent.com/Wycott/RepositoryResources/main/Graphics/language-csharp.svg" title="Language C#" alt="Language C#"></a>
 <a href="https://github.com/Wycott/RepositoryResources/blob/main/REPOTYPE.md"><img src="https://raw.githubusercontent.com/Wycott/RepositoryResources/main/Graphics/repo%20type-Application-yellow.svg" title="Application" alt="Application"></a>
-<img src="https://img.shields.io/badge/.NET_Core-9-red">
+<img src="https://img.shields.io/badge/.NET_Core-10-red">
 ![Build Status](https://github.com/Wycott/JukeBox/actions/workflows/dotnet.yml/badge.svg)
 
 ## Operation
@@ -34,4 +34,4 @@ The original version of this program was written in 2014.
 ---
 
 *Created: 28 June 2022*  
-*Updated: 18 November 2024*
+*Updated: 14 November 2025*
