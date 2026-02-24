@@ -2,7 +2,7 @@
 using JukeboxInterfaces;
 using Moq;
 
-namespace JukeboxLibrary.Test.Helpers;
+namespace JukeboxDomain.Test.Helpers;
 
 public class DisplayTest
 {

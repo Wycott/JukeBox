@@ -7,20 +7,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jukebox", "JukeBox\Jukebox.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JukeboxLibrary", "JukeBoxLibrary\JukeboxLibrary.csproj", "{2C3688FE-AC41-458E-A9D9-38A466F539E2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JukeboxLibrary.Test", "JukeboxLibrary.Test\JukeboxLibrary.Test.csproj", "{554101E1-2EB6-4596-9457-A8D2E9E1B180}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JukeboxInterfaces", "JukeboxInterfaces\JukeboxInterfaces.csproj", "{AAB2465F-0F3B-4CC8-AB7B-66461ED66D29}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JukeboxTypes", "JukeboxTypes\JukeboxTypes.csproj", "{13A43408-9765-4576-9FA7-82BE637E808D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JukeboxDomain", "JukeboxDomain\JukeboxDomain.csproj", "{7B83DC83-C62B-407E-9932-82E4D74C02D5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JukeboxHelpers", "JukeboxHelpers\JukeboxHelpers.csproj", "{85AB9D88-C4EF-4A4E-A4A2-EC8CD1078ADB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JukeboxDomain.Test", "JukeboxDomain.Test\JukeboxDomain.Test.csproj", "{841EE559-6A1F-D8FE-75BF-C131D01AF2BF}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
-	ProjectSection(SolutionItems) = preProject
-		.amazonq\rules\MyGaffMyRules.md = .amazonq\rules\MyGaffMyRules.md
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JukeboxLibrary.Test", "JukeboxLibrary.Test\JukeboxLibrary.Test.csproj", "{1827B9D4-AED4-434F-A943-F7B40C4FC2A8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,10 +31,6 @@ Global
 		{2C3688FE-AC41-458E-A9D9-38A466F539E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C3688FE-AC41-458E-A9D9-38A466F539E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2C3688FE-AC41-458E-A9D9-38A466F539E2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{554101E1-2EB6-4596-9457-A8D2E9E1B180}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{554101E1-2EB6-4596-9457-A8D2E9E1B180}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{554101E1-2EB6-4596-9457-A8D2E9E1B180}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{554101E1-2EB6-4596-9457-A8D2E9E1B180}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AAB2465F-0F3B-4CC8-AB7B-66461ED66D29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AAB2465F-0F3B-4CC8-AB7B-66461ED66D29}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AAB2465F-0F3B-4CC8-AB7B-66461ED66D29}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -52,10 +43,14 @@ Global
 		{7B83DC83-C62B-407E-9932-82E4D74C02D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7B83DC83-C62B-407E-9932-82E4D74C02D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7B83DC83-C62B-407E-9932-82E4D74C02D5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{85AB9D88-C4EF-4A4E-A4A2-EC8CD1078ADB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{85AB9D88-C4EF-4A4E-A4A2-EC8CD1078ADB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{85AB9D88-C4EF-4A4E-A4A2-EC8CD1078ADB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{85AB9D88-C4EF-4A4E-A4A2-EC8CD1078ADB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{841EE559-6A1F-D8FE-75BF-C131D01AF2BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{841EE559-6A1F-D8FE-75BF-C131D01AF2BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{841EE559-6A1F-D8FE-75BF-C131D01AF2BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{841EE559-6A1F-D8FE-75BF-C131D01AF2BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1827B9D4-AED4-434F-A943-F7B40C4FC2A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1827B9D4-AED4-434F-A943-F7B40C4FC2A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1827B9D4-AED4-434F-A943-F7B40C4FC2A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1827B9D4-AED4-434F-A943-F7B40C4FC2A8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
