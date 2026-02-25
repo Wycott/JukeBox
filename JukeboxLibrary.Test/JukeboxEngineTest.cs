@@ -1,8 +1,10 @@
+using AiAnnotations;
 using JukeboxInterfaces;
 using Moq;
 
 namespace JukeboxLibrary.Test;
 
+[AiGenerated]
 public class JukeboxEngineTest
 {
     [Fact]

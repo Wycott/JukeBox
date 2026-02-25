@@ -1,7 +1,9 @@
+using AiAnnotations;
 using JukeboxDomain.Helpers;
 
 namespace JukeboxDomain.Test.Helpers;
 
+[AiGenerated]
 public class ConsoleEngineTest
 {
     [Fact]

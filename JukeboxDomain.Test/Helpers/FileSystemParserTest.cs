@@ -1,3 +1,4 @@
+using AiAnnotations;
 using JukeboxDomain;
 using JukeboxDomain.Helpers;
 using JukeboxInterfaces;
@@ -5,6 +6,7 @@ using Moq;
 
 namespace JukeboxDomain.Test.Helpers;
 
+[AiGenerated]
 public class FileSystemParserTest
 {
     [Fact]
