@@ -2,6 +2,7 @@
 using JukeboxDomain.Helpers;
 using JukeboxInterfaces;
 using JukeboxLibrary;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Jukebox;
@@ -10,11 +11,18 @@ internal static class Program
 {
     private static void Main()
     {
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.json", optional: false)
+            .Build();
+
+        var songSourcePaths = configuration.GetSection("SongSources").Get<List<string>>() ?? new List<string>();
+
         var serviceProvider = new ServiceCollection()
             .AddSingleton<IConsoleEngine, ConsoleEngine>()
             .AddSingleton<IDisplay, Display>()
             .AddSingleton<IJukeboxEngine, JukeboxEngine>()
-            .AddSingleton<ISongSources, SongSources>()
+            .AddSingleton<ISongSources>(sp => new SongSources(sp.GetRequiredService<IDisplay>(), songSourcePaths))
             .AddSingleton<ISongList, SongList>()
             .AddSingleton<ISongPlayer, SongPlayer>()
             .BuildServiceProvider();

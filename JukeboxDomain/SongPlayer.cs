@@ -3,13 +3,10 @@ using NAudio.Wave;
 
 namespace JukeboxDomain;
 
-public class SongPlayer : ISongPlayer
+public class SongPlayer : ISongPlayer, IDisposable
 {
     private Mp3FileReader? FileReader { get; set; }
     private WaveOutEvent? Player { get; set; }
-
-    // TODO: Might be able to interrogate the various objects but surely this is easier
-    private bool SongPlaying { get; set; }
 
     private IDisplay DisplayEngine { get; }
 
@@ -22,12 +19,11 @@ public class SongPlayer : ISongPlayer
     {
         try
         {
-            CheckForPlayingSong();
+            StopAndDisposeCurrent();
             FileReader = new Mp3FileReader(filename);
             Player = new WaveOutEvent();
             Player.Init(FileReader);
             Player.Play();
-            SongPlaying = true;
         }
         catch (InvalidOperationException)
         {
@@ -35,15 +31,25 @@ public class SongPlayer : ISongPlayer
         }
     }
 
-    private void CheckForPlayingSong()
+    private void StopAndDisposeCurrent()
     {
-        if (!SongPlaying || Player == null)
+        if (Player != null)
         {
-            return;
+            Player.Stop();
+            Player.Dispose();
+            Player = null;
         }
 
-        Player.Stop();
-        // TODO: Dispose too probably
-        SongPlaying = false;
+        if (FileReader != null)
+        {
+            FileReader.Dispose();
+            FileReader = null;
+        }
+    }
+
+    public void Dispose()
+    {
+        StopAndDisposeCurrent();
+        GC.SuppressFinalize(this);
     }
 }

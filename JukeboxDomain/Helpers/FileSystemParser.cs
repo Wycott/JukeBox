@@ -52,19 +52,13 @@ public static class FileSystemParser
         return haveArtist ? retVal.OrderBy(_ => Guid.NewGuid()).ToList() : retVal;
     }
 
+    private static readonly string[] ValidExtensions = { ".mp3", ".m4a" };
+
     private static bool ExtensionsOk(string candidate)
     {
-        var extensions = new List<string> { ".mp3"};
+        var extension = Path.GetExtension(candidate);
 
-        foreach (var s in extensions)
-        {
-            if (candidate.Contains(s))
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return ValidExtensions.Any(ext => ext.Equals(extension, StringComparison.OrdinalIgnoreCase));
     }
 
     private static string PreparePattern(string initialPattern)

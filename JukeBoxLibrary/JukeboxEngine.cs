@@ -25,14 +25,14 @@ public class JukeboxEngine : IJukeboxEngine
         LetTheMusicPlay();
     }
 
-    private void LetTheMusicPlay() // Ru
+    private void LetTheMusicPlay()
     {
         var selectedPattern = string.Empty;
         var selectedSong = string.Empty;
 
         var jukeboxState = JukeboxStateType.ShowTitleBox;
 
-        while (true)
+        while (jukeboxState != JukeboxStateType.Unknown)
         {
             switch (jukeboxState)
             {
@@ -40,18 +40,17 @@ public class JukeboxEngine : IJukeboxEngine
                     jukeboxState = ShowTitleBox();
                     break;
                 case JukeboxStateType.RequestSong:
-                    jukeboxState = RequestSong(jukeboxState, out selectedPattern);
+                    jukeboxState = RequestSong(out selectedPattern);
                     break;
                 case JukeboxStateType.FindSong:
                     jukeboxState = FindSong(selectedPattern);
                     break;
                 case JukeboxStateType.SelectVersion:
-                    jukeboxState = SelectVersion(jukeboxState, out selectedSong);
+                    jukeboxState = SelectVersion(out selectedSong);
                     break;
                 case JukeboxStateType.PlaySong:
                     jukeboxState = PlaySong(selectedSong);
                     break;
-                case JukeboxStateType.Unknown:
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -65,9 +64,10 @@ public class JukeboxEngine : IJukeboxEngine
         return JukeboxStateType.RequestSong;
     }
 
-    private JukeboxStateType SelectVersion(JukeboxStateType jukeboxState, out string selectedSong)
+    private JukeboxStateType SelectVersion(out string selectedSong)
     {
         selectedSong = string.Empty;
+        var userCancelled = false;
 
         foreach (var song in SongList.SongCollection)
         {
@@ -75,7 +75,7 @@ public class JukeboxEngine : IJukeboxEngine
 
             if (isRightSong == null)
             {
-                jukeboxState = JukeboxStateType.RequestSong;
+                userCancelled = true;
                 break;
             }
 
@@ -85,19 +85,15 @@ public class JukeboxEngine : IJukeboxEngine
             }
 
             selectedSong = song.FullPath;
-            jukeboxState = JukeboxStateType.PlaySong;
-            break;
+            return JukeboxStateType.PlaySong;
         }
 
-        if (jukeboxState == JukeboxStateType.PlaySong)
+        if (!userCancelled)
         {
-            return jukeboxState;
+            DisplayEngine.WriteError("Nothing selected!");
         }
 
-        DisplayEngine.WriteError("Nothing selected!");
-        jukeboxState = JukeboxStateType.RequestSong;
-
-        return jukeboxState;
+        return JukeboxStateType.RequestSong;
     }
 
     private JukeboxStateType FindSong(string? selectedPattern)
@@ -122,17 +118,22 @@ public class JukeboxEngine : IJukeboxEngine
         return jukeboxState;
     }
 
-    private JukeboxStateType RequestSong(JukeboxStateType jukeboxState, out string? selectedPattern)
+    private JukeboxStateType RequestSong(out string? selectedPattern)
     {
-        ConsoleEngine.WriteText("Enter pattern: ");
+        ConsoleEngine.WriteText("Enter pattern (q to quit): ");
         selectedPattern = ConsoleEngine.ReadLine();
+
+        if (string.Equals(selectedPattern, "q", StringComparison.OrdinalIgnoreCase))
+        {
+            return JukeboxStateType.Unknown;
+        }
 
         if (!string.IsNullOrWhiteSpace(selectedPattern))
         {
-            jukeboxState = JukeboxStateType.FindSong;
+            return JukeboxStateType.FindSong;
         }
 
-        return jukeboxState;
+        return JukeboxStateType.RequestSong;
     }
 
     private JukeboxStateType ShowTitleBox()

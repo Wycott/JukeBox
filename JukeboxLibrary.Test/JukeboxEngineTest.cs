@@ -151,7 +151,7 @@ public class JukeboxEngineTest
     }
 
     [Fact]
-    public void Start_UserSkipsSong_ShowsNothingSelectedError()
+    public void Start_UserSkipsSong_ReturnsToPromptWithoutError()
     {
         // Arrange
         var songSourcesMock = new Mock<ISongSources>();
@@ -178,8 +178,8 @@ public class JukeboxEngineTest
         // Act
         try { engine.Start(); } catch (OperationCanceledException) { }
 
-        // Assert
-        displayMock.Verify(x => x.WriteError("Nothing selected!"), Times.Once);
+        // Assert - user cancelled, so no error message should be shown
+        displayMock.Verify(x => x.WriteError(It.IsAny<string>()), Times.Never);
     }
 
     [Fact]

@@ -11,13 +11,14 @@ public class SongSourcesTest
     {
         // Arrange
         var displayMock = new Mock<IDisplay>();
+        var sources = new List<string> { @"C:\Music\", @"D:\Songs\" };
 
         // Act
-        var songSources = new SongSources(displayMock.Object);
+        var songSources = new SongSources(displayMock.Object, sources);
 
         // Assert
         Assert.NotNull(songSources.Sources);
-        Assert.NotEmpty(songSources.Sources);
+        Assert.Equal(2, songSources.Sources.Count);
     }
 
     [Fact]
@@ -25,9 +26,10 @@ public class SongSourcesTest
     {
         // Arrange
         var displayMock = new Mock<IDisplay>();
+        var sources = new List<string> { @"C:\Music\" };
 
         // Act
-        var songSources = new SongSources(displayMock.Object);
+        var songSources = new SongSources(displayMock.Object, sources);
 
         // Assert
         displayMock.Verify(x => x.WriteYellowText(It.IsAny<string>()), Times.AtLeastOnce);
@@ -38,9 +40,10 @@ public class SongSourcesTest
     {
         // Arrange
         var displayMock = new Mock<IDisplay>();
+        var sources = new List<string> { @"C:\Music\", @"D:\Songs\" };
 
         // Act
-        var songSources = new SongSources(displayMock.Object);
+        var songSources = new SongSources(displayMock.Object, sources);
 
         // Assert
         displayMock.Verify(x => x.WriteYellowText(It.Is<string>(s => s.Contains("songs"))), Times.Exactly(songSources.Sources.Count));

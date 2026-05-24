@@ -8,13 +8,5 @@ public class Song : ISong
 
     public string ShortenedPath { get; set; } = string.Empty;
 
-    public string FileName
-    {
-        get
-        {
-            var parts = FullPath.Split('\\');
-
-            return parts[^1];
-        }
-    }
+    public string FileName => Path.GetFileName(FullPath);
 }

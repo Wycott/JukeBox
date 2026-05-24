@@ -11,10 +11,10 @@ public class Display : IDisplay
         ConsoleEngine = consoleEngine;
     }
 
-    private static int currentColour;
+    private int _currentColour;
 
     // Yes, could have enumerated console colours but some of them aren't very bright
-    private static readonly List<ConsoleColor> BrightColours = new()
+    private static readonly ConsoleColor[] BrightColours =
     {
         ConsoleColor.Blue,
         ConsoleColor.Green,
@@ -104,18 +104,17 @@ public class Display : IDisplay
 
         foreach (var c in line)
         {
-            var printString = c.ToString();
-            ConsoleEngine.TextColour = BrightColours[currentColour];
+            ConsoleEngine.TextColour = BrightColours[_currentColour];
             ConsoleEngine.WriteText(c.ToString());
 
-            if (printString != " ")
+            if (c != ' ')
             {
-                currentColour++;
+                _currentColour++;
             }
 
-            if (currentColour == BrightColours.ToList().Count)
+            if (_currentColour == BrightColours.Length)
             {
-                currentColour = 0;
+                _currentColour = 0;
             }
         }
 

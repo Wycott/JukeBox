@@ -8,24 +8,10 @@ public class SongSources : ISongSources
 
     public List<string> Sources { get; set; } = new();
 
-    public SongSources(IDisplay display)
+    public SongSources(IDisplay display, List<string> sources)
     {
         _display = display;
-        Init();
-    }
-
-    private void Init()
-    {
-        // TODO: Should read from config or similar
-        Sources = new List<string>()
-        {
-            @"E:\iTunes Music\",
-            //@"D:\iTunes Music\",
-            //@"D:\Program Files (x86)\Origin Games\The Sims 4\",
-            @"C:\Users\rober\Music\",
-            @"C:\RobMusic\VlcConversions\"
-        };
-
+        Sources = sources;
         DisplaySongCounts();
     }
 
