@@ -120,7 +120,7 @@ public class JukeboxEngine : IJukeboxEngine
     {
         selectedSong = string.Empty;
 
-        ConsoleEngine.WriteText("Enter pattern: ");
+        ConsoleEngine.WriteText("Enter pattern or command ");
         var input = ConsoleEngine.ReadLine();
 
         if (string.Equals(input, ":q", StringComparison.OrdinalIgnoreCase))
