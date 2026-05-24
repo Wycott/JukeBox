@@ -14,9 +14,11 @@ public class JukeboxEngine : IJukeboxEngine
 
     private string _lastPattern = string.Empty;
     private bool _inFavouritesMode;
+    private readonly int _favouritesPageSize;
 
     public JukeboxEngine(ISongSources songSources, ISongList songList, ISongPlayer songPlayer,
-        IDisplay displayEngine, IConsoleEngine consoleEngine, IFavourites favourites)
+        IDisplay displayEngine, IConsoleEngine consoleEngine, IFavourites favourites,
+        int favouritesPageSize = 20)
     {
         ConsoleEngine = consoleEngine;
         SongSources = songSources;
@@ -24,6 +26,7 @@ public class JukeboxEngine : IJukeboxEngine
         SongPlayer = songPlayer;
         DisplayEngine = displayEngine;
         Favourites = favourites;
+        _favouritesPageSize = favouritesPageSize;
     }
 
     public void Start(CancellationToken cancellationToken = default)
@@ -211,10 +214,25 @@ public class JukeboxEngine : IJukeboxEngine
             return;
         }
 
+        var displayed = 0;
+
         foreach (var entry in favourites)
         {
             var fileName = Path.GetFileName(entry.FullPath);
             DisplayEngine.WriteYellowText($"  {entry.PlayCount}x  {fileName}");
+            displayed++;
+
+            if (displayed % _favouritesPageSize == 0 && displayed < favourites.Count)
+            {
+                ConsoleEngine.WriteText("-- More (any key) or q to stop --");
+                var key = ConsoleEngine.ReadAKey();
+                ConsoleEngine.WriteALine();
+
+                if (key.Key == ConsoleKey.Q)
+                {
+                    break;
+                }
+            }
         }
     }
 
@@ -229,6 +247,10 @@ public class JukeboxEngine : IJukeboxEngine
 
     private void ShowHelp()
     {
+        ConsoleEngine.WriteALine();
+        ConsoleEngine.WriteALine("Patterns:");
+        ConsoleEngine.WriteALine("  yellow sub      - might match 'Yellow Submarine' (words become wildcards)");
+        ConsoleEngine.WriteALine("  *@doors         - might match anything by 'The Doors' (artist search)");
         ConsoleEngine.WriteALine();
         ConsoleEngine.WriteALine("Commands:");
         ConsoleEngine.WriteALine("  :n  - Next (repeat last search or next favourite)");

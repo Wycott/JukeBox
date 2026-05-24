@@ -5,7 +5,7 @@ namespace JukeboxDomain;
 
 public class Favourites : IFavourites
 {
-    private const int MaxFavourites = 100;
+    private readonly int _maxFavourites;
     private readonly string _filePath;
     private Dictionary<string, int> _playCounts;
 
@@ -14,9 +14,10 @@ public class Favourites : IFavourites
         WriteIndented = true
     };
 
-    public Favourites(string filePath)
+    public Favourites(string filePath, int maxFavourites = 100)
     {
         _filePath = filePath;
+        _maxFavourites = maxFavourites;
         _playCounts = Load();
     }
 
@@ -59,14 +60,14 @@ public class Favourites : IFavourites
 
     private void Trim()
     {
-        if (_playCounts.Count <= MaxFavourites)
+        if (_playCounts.Count <= _maxFavourites)
         {
             return;
         }
 
         _playCounts = _playCounts
             .OrderByDescending(kvp => kvp.Value)
-            .Take(MaxFavourites)
+            .Take(_maxFavourites)
             .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
     }
 

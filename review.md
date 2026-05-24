@@ -1,4 +1,4 @@
-`# JukeBox Code Review
+```# JukeBox Code Review
 
 ## Critical Priority
 
@@ -189,7 +189,7 @@ The codebase is in solid shape after the previous rounds of fixes. The remaining
 - [ ] **`Favourites` stores full file paths as dictionary keys — fragile if files move**
   If a user reorganises their music library, all favourites become orphaned entries that can never be played again. Consider storing a normalised key (e.g. artist + filename) or validating paths on load.
 
-- [ ] **`ListFavourites` shows all 100 entries with no pagination**
+- [x] **`ListFavourites` shows all 100 entries with no pagination**
   If the user has 100 favourites, `:l` dumps them all at once which scrolls off screen. Consider showing the top 20 with a "press any key for more" prompt, or limiting the display count.
 
 - [ ] **`ShowHelp` uses `ConsoleEngine` directly — inconsistent with other display methods**
@@ -198,8 +198,8 @@ The codebase is in solid shape after the previous rounds of fixes. The remaining
 - [ ] **`ISongSources.DisplaySongCounts()` is a UI concern on a data interface**
   The interface mixes data access (`Sources`) with presentation (`DisplaySongCounts`). This makes it harder to reuse `ISongSources` in a non-console context. Consider moving the display logic to the engine or a dedicated presenter.
 
-- [ ] **No unit tests for the `Favourites` class**
+- [x] **No unit tests for the `Favourites` class**
   `Favourites` has file I/O, trimming logic, and JSON serialization but no dedicated tests. The engine tests mock `IFavourites`, so the actual implementation is untested. Add tests using a temp file to verify `RecordPlay`, `GetTopFavourites`, `GetRandomFavourite`, trimming at 100, and corrupt JSON handling.
 
-- [ ] **`@` artist marker in search pattern is undocumented in help**
+- [x] **`@` artist marker in search pattern is undocumented in help**
   The `:?` help shows commands but doesn't mention the `@artist` search syntax (e.g. `*@stones`). Users won't discover this feature without reading the source code.
