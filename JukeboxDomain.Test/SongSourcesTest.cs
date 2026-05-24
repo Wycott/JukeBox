@@ -66,3 +66,47 @@ public class SongSourcesTest
         displayMock.Verify(x => x.WriteYellowText(It.IsAny<string>()), Times.Once);
     }
 }
+
+public class SongSourcesEdgeCaseTest
+{
+    [Fact]
+    public void Constructor_WithEmptySources_InitializesEmptyList()
+    {
+        // Arrange
+        var displayMock = new Mock<IDisplay>();
+
+        // Act
+        var songSources = new SongSources(displayMock.Object, new List<string>());
+
+        // Assert
+        Assert.Empty(songSources.Sources);
+    }
+
+    [Fact]
+    public void DisplaySongCounts_WithEmptySources_DoesNotCallDisplay()
+    {
+        // Arrange
+        var displayMock = new Mock<IDisplay>();
+        var songSources = new SongSources(displayMock.Object, new List<string>());
+
+        // Act
+        songSources.DisplaySongCounts();
+
+        // Assert
+        displayMock.Verify(x => x.WriteYellowText(It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact]
+    public void DisplaySongCounts_WithNonExistentPath_ShowsZeroCount()
+    {
+        // Arrange
+        var displayMock = new Mock<IDisplay>();
+        var songSources = new SongSources(displayMock.Object, new List<string> { @"Z:\NonExistent\" });
+
+        // Act
+        songSources.DisplaySongCounts();
+
+        // Assert
+        displayMock.Verify(x => x.WriteYellowText(It.Is<string>(s => s.Contains("0 songs"))), Times.Once);
+    }
+}

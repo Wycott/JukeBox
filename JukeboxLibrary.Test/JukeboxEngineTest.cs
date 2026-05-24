@@ -194,3 +194,125 @@ public class JukeboxEngineTest
         displayMock.Verify(x => x.FlowerBox(), Times.Once);
     }
 }
+
+public class JukeboxEngineAdditionalTest
+{
+    [Fact]
+    public void Start_ShowTitleBox_CallsDisplaySongCounts()
+    {
+        // Arrange
+        var songSourcesMock = new Mock<ISongSources>();
+        var songListMock = new Mock<ISongList>();
+        var songPlayerMock = new Mock<ISongPlayer>();
+        var displayMock = new Mock<IDisplay>();
+        var consoleMock = new Mock<IConsoleEngine>();
+
+        consoleMock.Setup(x => x.ReadLine()).Returns("q");
+
+        var engine = new JukeboxEngine(songSourcesMock.Object, songListMock.Object,
+            songPlayerMock.Object, displayMock.Object, consoleMock.Object);
+
+        // Act
+        engine.Start();
+
+        // Assert
+        songSourcesMock.Verify(x => x.DisplaySongCounts(), Times.Once);
+    }
+
+    [Fact]
+    public void Start_WithUppercaseQ_ExitsGracefully()
+    {
+        // Arrange
+        var songSourcesMock = new Mock<ISongSources>();
+        var songListMock = new Mock<ISongList>();
+        var songPlayerMock = new Mock<ISongPlayer>();
+        var displayMock = new Mock<IDisplay>();
+        var consoleMock = new Mock<IConsoleEngine>();
+
+        consoleMock.Setup(x => x.ReadLine()).Returns("Q");
+
+        var engine = new JukeboxEngine(songSourcesMock.Object, songListMock.Object,
+            songPlayerMock.Object, displayMock.Object, consoleMock.Object);
+
+        // Act
+        engine.Start();
+
+        // Assert
+        displayMock.Verify(x => x.FlowerBox(), Times.Once);
+        songListMock.Verify(x => x.Build(It.IsAny<ISongSources>(), It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact]
+    public void Start_WithNullReadLine_StaysInRequestState()
+    {
+        // Arrange
+        var songSourcesMock = new Mock<ISongSources>();
+        var songListMock = new Mock<ISongList>();
+        var songPlayerMock = new Mock<ISongPlayer>();
+        var displayMock = new Mock<IDisplay>();
+        var consoleMock = new Mock<IConsoleEngine>();
+
+        var callCount = 0;
+        consoleMock.Setup(x => x.ReadLine()).Returns(() => callCount++ == 0 ? null : "q");
+
+        var engine = new JukeboxEngine(songSourcesMock.Object, songListMock.Object,
+            songPlayerMock.Object, displayMock.Object, consoleMock.Object);
+
+        // Act
+        engine.Start();
+
+        // Assert
+        songListMock.Verify(x => x.Build(It.IsAny<ISongSources>(), It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact]
+    public void Start_UserRejectsAllSongs_ShowsNothingSelectedError()
+    {
+        // Arrange
+        var songSourcesMock = new Mock<ISongSources>();
+        var songListMock = new Mock<ISongList>();
+        var songPlayerMock = new Mock<ISongPlayer>();
+        var displayMock = new Mock<IDisplay>();
+        var consoleMock = new Mock<IConsoleEngine>();
+        var songMock = new Mock<ISong>();
+
+        songMock.Setup(x => x.ShortenedPath).Returns("test");
+        songListMock.Setup(x => x.SongCollection).Returns(new List<ISong> { songMock.Object });
+
+        var callCount = 0;
+        consoleMock.Setup(x => x.ReadLine()).Returns(() => callCount++ == 0 ? "test" : "q");
+        displayMock.Setup(x => x.IsThisTheRightSong(It.IsAny<string>())).Returns(false);
+
+        var engine = new JukeboxEngine(songSourcesMock.Object, songListMock.Object,
+            songPlayerMock.Object, displayMock.Object, consoleMock.Object);
+
+        // Act
+        engine.Start();
+
+        // Assert
+        displayMock.Verify(x => x.WriteError("Nothing selected!"), Times.Once);
+    }
+
+    [Fact]
+    public void Start_WhitespaceOnlyPattern_DoesNotSearch()
+    {
+        // Arrange
+        var songSourcesMock = new Mock<ISongSources>();
+        var songListMock = new Mock<ISongList>();
+        var songPlayerMock = new Mock<ISongPlayer>();
+        var displayMock = new Mock<IDisplay>();
+        var consoleMock = new Mock<IConsoleEngine>();
+
+        var callCount = 0;
+        consoleMock.Setup(x => x.ReadLine()).Returns(() => callCount++ == 0 ? "   " : "q");
+
+        var engine = new JukeboxEngine(songSourcesMock.Object, songListMock.Object,
+            songPlayerMock.Object, displayMock.Object, consoleMock.Object);
+
+        // Act
+        engine.Start();
+
+        // Assert
+        songListMock.Verify(x => x.Build(It.IsAny<ISongSources>(), It.IsAny<string>()), Times.Never);
+    }
+}

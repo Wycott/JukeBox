@@ -58,3 +58,35 @@ public class SongPlayerTest
         Assert.Null(exception);
     }
 }
+
+public class SongPlayerSequentialTest
+{
+    [Fact]
+    public void PlaySong_CalledTwiceWithInvalidFiles_ShowsErrorTwice()
+    {
+        // Arrange
+        var displayMock = new Mock<IDisplay>();
+        using var player = new SongPlayer(displayMock.Object);
+
+        // Act
+        player.PlaySong("first_missing.mp3");
+        player.PlaySong("second_missing.mp3");
+
+        // Assert
+        displayMock.Verify(x => x.WriteError(It.IsAny<string>()), Times.Exactly(2));
+    }
+
+    [Fact]
+    public void PlaySong_WithNullPath_ShowsError()
+    {
+        // Arrange
+        var displayMock = new Mock<IDisplay>();
+        using var player = new SongPlayer(displayMock.Object);
+
+        // Act
+        player.PlaySong(null!);
+
+        // Assert
+        displayMock.Verify(x => x.WriteError(It.IsAny<string>()), Times.Once);
+    }
+}
