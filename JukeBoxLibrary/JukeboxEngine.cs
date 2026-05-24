@@ -243,7 +243,7 @@ public class JukeboxEngine(
     {
         ConsoleEngine.WriteALine();
         ConsoleEngine.WriteALine("Patterns:");
-        ConsoleEngine.WriteALine("  yellow sub      - might match 'Yellow Submarine' (words become wildcards)");
+        ConsoleEngine.WriteALine("  yell sub        - might match 'Yellow Submarine' (words become wildcards)");
         ConsoleEngine.WriteALine("  *@doors         - might match anything by 'The Doors' (artist search)");
         ConsoleEngine.WriteALine();
         ConsoleEngine.WriteALine("Commands:");
