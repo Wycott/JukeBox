@@ -1,4 +1,4 @@
-# JukeBox Code Review
+`# JukeBox Code Review
 
 ## Critical Priority
 
@@ -162,3 +162,44 @@ The codebase is in solid shape after the previous rounds of fixes. The remaining
 
 - [x] **Solution file still references old-style project GUIDs (`FAE04EC0-...`) for test projects**
   The test projects use the legacy project type GUID (`FAE04EC0-301F-11D3-BF4B-00C04F79EFBC`) while the main projects use the SDK-style GUID (`9A19103F-16F7-4668-BE54-9A1E7A4F7556`). This is cosmetic and doesn't affect builds, but normalizing them would clean up the solution file.
+
+---
+
+## Post-Favourites Review
+
+### Medium Priority
+
+- [ ] **`Favourites.RecordPlay` writes to disk on every single play — potential performance issue**
+  Every song play triggers a JSON serialize + file write. For rapid `:f` / `:n` usage this could cause noticeable lag. Consider debouncing the save (e.g. save on exit or after a short delay) or only writing periodically.
+
+- [ ] **`Favourites` has no thread safety — concurrent access could corrupt state**
+  If `RecordPlay` and `GetRandomFavourite` were ever called from different threads (e.g. future async playback), the `_playCounts` dictionary could be corrupted. Not a problem today with the single-threaded loop, but worth noting if the architecture evolves.
+
+- [ ] **`Favourites.RecordPlay` records the play even if `SongPlayer.PlaySong` fails**
+  In `JukeboxEngine.PlaySong`, `RecordPlay` is called unconditionally after `SongPlayer.PlaySong`. If the player catches an exception (invalid file, etc.), the song still gets counted as played. Move `RecordPlay` inside a success path or have `PlaySong` return a success indicator.
+
+- [ ] **`PlayRandomFavourite` can pick the same song repeatedly**
+  `GetRandomFavourite` picks any random entry from the dictionary. There's no deduplication, so `:f` then `:n` could play the same song twice in a row. Consider tracking the last played favourite and excluding it from the next random pick.
+
+- [ ] **`JukeboxLibrary` references `JukeboxDomain` but only uses interfaces — unnecessary coupling**
+  `JukeboxLibrary.csproj` has a `ProjectReference` to `JukeboxDomain`, but `JukeboxEngine` only depends on interfaces from `JukeboxInterfaces`. The reference exists because the engine previously used `FileSystemParser` directly, but that's now injected. Remove the reference to keep the library layer clean.
+
+### Low Priority
+
+- [ ] **`Favourites` stores full file paths as dictionary keys — fragile if files move**
+  If a user reorganises their music library, all favourites become orphaned entries that can never be played again. Consider storing a normalised key (e.g. artist + filename) or validating paths on load.
+
+- [ ] **`ListFavourites` shows all 100 entries with no pagination**
+  If the user has 100 favourites, `:l` dumps them all at once which scrolls off screen. Consider showing the top 20 with a "press any key for more" prompt, or limiting the display count.
+
+- [ ] **`ShowHelp` uses `ConsoleEngine` directly — inconsistent with other display methods**
+  Most text output goes through `DisplayEngine` (which handles colours), but `ShowHelp` writes directly via `ConsoleEngine.WriteALine`. This means help text is always the default console colour. Consider using `DisplayEngine` for consistency, or at minimum document the intentional difference.
+
+- [ ] **`ISongSources.DisplaySongCounts()` is a UI concern on a data interface**
+  The interface mixes data access (`Sources`) with presentation (`DisplaySongCounts`). This makes it harder to reuse `ISongSources` in a non-console context. Consider moving the display logic to the engine or a dedicated presenter.
+
+- [ ] **No unit tests for the `Favourites` class**
+  `Favourites` has file I/O, trimming logic, and JSON serialization but no dedicated tests. The engine tests mock `IFavourites`, so the actual implementation is untested. Add tests using a temp file to verify `RecordPlay`, `GetTopFavourites`, `GetRandomFavourite`, trimming at 100, and corrupt JSON handling.
+
+- [ ] **`@` artist marker in search pattern is undocumented in help**
+  The `:?` help shows commands but doesn't mention the `@artist` search syntax (e.g. `*@stones`). Users won't discover this feature without reading the source code.
