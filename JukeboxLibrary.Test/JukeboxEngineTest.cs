@@ -16,24 +16,14 @@ public class JukeboxEngineTest
         var songPlayerMock = new Mock<ISongPlayer>();
         var displayMock = new Mock<IDisplay>();
         var consoleMock = new Mock<IConsoleEngine>();
-        
-        var cts = new CancellationTokenSource();
-        consoleMock.Setup(x => x.WriteText(It.IsAny<string>()));
-        consoleMock.Setup(x => x.ReadLine())
-            .Callback(() => cts.Cancel())
-            .Throws(new OperationCanceledException());
-        
-        var engine = new JukeboxEngine(songSourcesMock.Object, songListMock.Object, 
+
+        consoleMock.Setup(x => x.ReadLine()).Returns("q");
+
+        var engine = new JukeboxEngine(songSourcesMock.Object, songListMock.Object,
             songPlayerMock.Object, displayMock.Object, consoleMock.Object);
 
         // Act
-        try
-        {
-            engine.Start();
-        }
-        catch (OperationCanceledException)
-        {
-        }
+        engine.Start();
 
         // Assert
         displayMock.Verify(x => x.FlowerBox(), Times.Once);
@@ -53,20 +43,16 @@ public class JukeboxEngineTest
         songMock.Setup(x => x.FullPath).Returns("test.mp3");
         songMock.Setup(x => x.ShortenedPath).Returns("test");
         songListMock.Setup(x => x.SongCollection).Returns(new List<ISong> { songMock.Object });
-        
+
         var callCount = 0;
-        consoleMock.Setup(x => x.ReadLine()).Returns(() => 
-        {
-            if (callCount++ == 0) return "test";
-            throw new OperationCanceledException();
-        });
+        consoleMock.Setup(x => x.ReadLine()).Returns(() => callCount++ == 0 ? "test" : "q");
         displayMock.Setup(x => x.IsThisTheRightSong(It.IsAny<string>())).Returns(true);
-        
-        var engine = new JukeboxEngine(songSourcesMock.Object, songListMock.Object, 
+
+        var engine = new JukeboxEngine(songSourcesMock.Object, songListMock.Object,
             songPlayerMock.Object, displayMock.Object, consoleMock.Object);
 
         // Act
-        try { engine.Start(); } catch (OperationCanceledException) { }
+        engine.Start();
 
         // Assert
         songListMock.Verify(x => x.Build(songSourcesMock.Object, "test"), Times.Once);
@@ -82,19 +68,15 @@ public class JukeboxEngineTest
         var songPlayerMock = new Mock<ISongPlayer>();
         var displayMock = new Mock<IDisplay>();
         var consoleMock = new Mock<IConsoleEngine>();
-        
+
         var callCount = 0;
-        consoleMock.Setup(x => x.ReadLine()).Returns(() => 
-        {
-            if (callCount++ < 2) return "";
-            throw new OperationCanceledException();
-        });
-        
-        var engine = new JukeboxEngine(songSourcesMock.Object, songListMock.Object, 
+        consoleMock.Setup(x => x.ReadLine()).Returns(() => callCount++ < 2 ? "" : "q");
+
+        var engine = new JukeboxEngine(songSourcesMock.Object, songListMock.Object,
             songPlayerMock.Object, displayMock.Object, consoleMock.Object);
 
         // Act
-        try { engine.Start(); } catch (OperationCanceledException) { }
+        engine.Start();
 
         // Assert
         songListMock.Verify(x => x.Build(It.IsAny<ISongSources>(), It.IsAny<string>()), Times.Never);
@@ -111,19 +93,15 @@ public class JukeboxEngineTest
         var consoleMock = new Mock<IConsoleEngine>();
 
         songListMock.Setup(x => x.SongCollection).Returns(new List<ISong>());
-        
+
         var callCount = 0;
-        consoleMock.Setup(x => x.ReadLine()).Returns(() => 
-        {
-            if (callCount++ == 0) return "test";
-            throw new OperationCanceledException();
-        });
-        
-        var engine = new JukeboxEngine(songSourcesMock.Object, songListMock.Object, 
+        consoleMock.Setup(x => x.ReadLine()).Returns(() => callCount++ == 0 ? "test" : "q");
+
+        var engine = new JukeboxEngine(songSourcesMock.Object, songListMock.Object,
             songPlayerMock.Object, displayMock.Object, consoleMock.Object);
 
         // Act
-        try { engine.Start(); } catch (OperationCanceledException) { }
+        engine.Start();
 
         // Assert
         displayMock.Verify(x => x.WriteError("Not Found!"), Times.Once);
@@ -142,20 +120,16 @@ public class JukeboxEngineTest
 
         songMock.Setup(x => x.ShortenedPath).Returns("test");
         songListMock.Setup(x => x.SongCollection).Returns(new List<ISong> { songMock.Object });
-        
+
         var callCount = 0;
-        consoleMock.Setup(x => x.ReadLine()).Returns(() => 
-        {
-            if (callCount++ == 0) return "test";
-            throw new OperationCanceledException();
-        });
+        consoleMock.Setup(x => x.ReadLine()).Returns(() => callCount++ == 0 ? "test" : "q");
         displayMock.Setup(x => x.IsThisTheRightSong(It.IsAny<string>())).Returns((bool?)null);
-        
-        var engine = new JukeboxEngine(songSourcesMock.Object, songListMock.Object, 
+
+        var engine = new JukeboxEngine(songSourcesMock.Object, songListMock.Object,
             songPlayerMock.Object, displayMock.Object, consoleMock.Object);
 
         // Act
-        try { engine.Start(); } catch (OperationCanceledException) { }
+        engine.Start();
 
         // Assert - user cancelled, so no error message should be shown
         displayMock.Verify(x => x.WriteError(It.IsAny<string>()), Times.Never);
@@ -178,26 +152,45 @@ public class JukeboxEngineTest
         song2Mock.Setup(x => x.ShortenedPath).Returns("test2");
         song2Mock.Setup(x => x.FullPath).Returns("test2.mp3");
         songListMock.Setup(x => x.SongCollection).Returns(new List<ISong> { song1Mock.Object, song2Mock.Object });
-        
+
         var callCount = 0;
-        consoleMock.Setup(x => x.ReadLine()).Returns(() => 
-        {
-            if (callCount++ == 0) return "test";
-            throw new OperationCanceledException();
-        });
-        
+        consoleMock.Setup(x => x.ReadLine()).Returns(() => callCount++ == 0 ? "test" : "q");
+
         var songCallCount = 0;
         displayMock.Setup(x => x.IsThisTheRightSong(It.IsAny<string>())).Returns(() => songCallCount++ == 0 ? false : true);
-        
-        var engine = new JukeboxEngine(songSourcesMock.Object, songListMock.Object, 
+
+        var engine = new JukeboxEngine(songSourcesMock.Object, songListMock.Object,
             songPlayerMock.Object, displayMock.Object, consoleMock.Object);
 
         // Act
-        try { engine.Start(); } catch (OperationCanceledException) { }
+        engine.Start();
 
         // Assert
         displayMock.Verify(x => x.IsThisTheRightSong("test1"), Times.Once);
         displayMock.Verify(x => x.IsThisTheRightSong("test2"), Times.Once);
         songPlayerMock.Verify(x => x.PlaySong("test2.mp3"), Times.Once);
+    }
+
+    [Fact]
+    public void Start_WithCancellationToken_ExitsGracefully()
+    {
+        // Arrange
+        var songSourcesMock = new Mock<ISongSources>();
+        var songListMock = new Mock<ISongList>();
+        var songPlayerMock = new Mock<ISongPlayer>();
+        var displayMock = new Mock<IDisplay>();
+        var consoleMock = new Mock<IConsoleEngine>();
+
+        using var cts = new CancellationTokenSource();
+        consoleMock.Setup(x => x.ReadLine()).Callback(() => cts.Cancel()).Returns("");
+
+        var engine = new JukeboxEngine(songSourcesMock.Object, songListMock.Object,
+            songPlayerMock.Object, displayMock.Object, consoleMock.Object);
+
+        // Act
+        engine.Start(cts.Token);
+
+        // Assert - should exit without throwing
+        displayMock.Verify(x => x.FlowerBox(), Times.Once);
     }
 }

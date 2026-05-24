@@ -20,19 +20,19 @@ public class JukeboxEngine : IJukeboxEngine
         DisplayEngine = displayEngine;
     }
 
-    public void Start()
+    public void Start(CancellationToken cancellationToken = default)
     {
-        LetTheMusicPlay();
+        LetTheMusicPlay(cancellationToken);
     }
 
-    private void LetTheMusicPlay()
+    private void LetTheMusicPlay(CancellationToken cancellationToken)
     {
         var selectedPattern = string.Empty;
         var selectedSong = string.Empty;
 
         var jukeboxState = JukeboxStateType.ShowTitleBox;
 
-        while (jukeboxState != JukeboxStateType.Exit)
+        while (jukeboxState != JukeboxStateType.Exit && !cancellationToken.IsCancellationRequested)
         {
             switch (jukeboxState)
             {
@@ -133,6 +133,7 @@ public class JukeboxEngine : IJukeboxEngine
     private JukeboxStateType ShowTitleBox()
     {
         DisplayEngine.FlowerBox();
+        SongSources.DisplaySongCounts();
 
         return JukeboxStateType.RequestSong;
     }

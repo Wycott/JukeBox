@@ -13,9 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JukeboxTypes", "JukeboxType
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JukeboxDomain", "JukeboxDomain\JukeboxDomain.csproj", "{7B83DC83-C62B-407E-9932-82E4D74C02D5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JukeboxDomain.Test", "JukeboxDomain.Test\JukeboxDomain.Test.csproj", "{841EE559-6A1F-D8FE-75BF-C131D01AF2BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JukeboxDomain.Test", "JukeboxDomain.Test\JukeboxDomain.Test.csproj", "{841EE559-6A1F-D8FE-75BF-C131D01AF2BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JukeboxLibrary.Test", "JukeboxLibrary.Test\JukeboxLibrary.Test.csproj", "{1827B9D4-AED4-434F-A943-F7B40C4FC2A8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JukeboxLibrary.Test", "JukeboxLibrary.Test\JukeboxLibrary.Test.csproj", "{1827B9D4-AED4-434F-A943-F7B40C4FC2A8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

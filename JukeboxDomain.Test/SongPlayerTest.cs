@@ -11,7 +11,7 @@ public class SongPlayerTest
     {
         // Arrange
         var displayMock = new Mock<IDisplay>();
-        var player = new SongPlayer(displayMock.Object);
+        using var player = new SongPlayer(displayMock.Object);
 
         // Act
         player.PlaySong("nonexistent_file.mp3");
@@ -25,7 +25,7 @@ public class SongPlayerTest
     {
         // Arrange
         var displayMock = new Mock<IDisplay>();
-        var player = new SongPlayer(displayMock.Object);
+        using var player = new SongPlayer(displayMock.Object);
 
         // Act
         player.PlaySong("");

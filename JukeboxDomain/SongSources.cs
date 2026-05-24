@@ -5,6 +5,7 @@ namespace JukeboxDomain;
 public class SongSources : ISongSources
 {
     private readonly IDisplay _display;
+    private bool _songCountsDisplayed;
 
     public IReadOnlyList<string> Sources { get; }
 
@@ -12,11 +13,17 @@ public class SongSources : ISongSources
     {
         _display = display;
         Sources = sources;
-        DisplaySongCounts();
     }
 
-    private void DisplaySongCounts()
+    public void DisplaySongCounts()
     {
+        if (_songCountsDisplayed)
+        {
+            return;
+        }
+
+        _songCountsDisplayed = true;
+
         foreach (var source in Sources)
         {
             var count = CountSongsInSource(source);

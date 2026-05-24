@@ -2,5 +2,5 @@
 
 public interface IJukeboxEngine
 {
-    void Start();
+    void Start(CancellationToken cancellationToken = default);
 }

@@ -29,4 +29,8 @@
     <ProjectReference Include="..\JukeboxDomain\JukeboxDomain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
 </Project>

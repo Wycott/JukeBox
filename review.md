@@ -134,31 +134,31 @@ The codebase is in solid shape after the previous rounds of fixes. The remaining
 
 ### Medium Priority
 
-- [ ] **`SongPlayer` tests don't dispose the player — potential test resource leaks**
+- [x] **`SongPlayer` tests don't dispose the player — potential test resource leaks**
   `SongPlayerTest` creates `SongPlayer` instances (which implement `IDisposable`) but never wraps them in `using` statements. While unlikely to cause issues in a test runner, it's inconsistent with the disposal pattern we've established.
 
-- [ ] **`ConsoleEngineTest` mutates global `Console.SetOut`/`Console.SetIn` without restoring**
+- [x] **`ConsoleEngineTest` mutates global `Console.SetOut`/`Console.SetIn` without restoring**
   Tests redirect `Console.Out` and `Console.In` but never restore the originals. If tests run in parallel or a later test depends on standard console streams, this could cause flaky failures. Capture and restore the original streams in a `try/finally` or use `IDisposable` test fixtures.
 
-- [ ] **`FileSystemParser.ParseFileSystem` only catches `DirectoryNotFoundException` from `GetDirectories`**
+- [x] **`FileSystemParser.ParseFileSystem` only catches `DirectoryNotFoundException` from `GetDirectories`**
   Similar to the fix applied in `SongSources`, the outer `GetDirectories` call in `ParseFileSystem` should also catch `UnauthorizedAccessException` and `IOException` for resilience against network drives or permission issues.
 
-- [ ] **`IFileSystemParser.ParseFileSystem` returns `List<ISong>` — should return `IReadOnlyList<ISong>`**
+- [x] **`IFileSystemParser.ParseFileSystem` returns `List<ISong>` — should return `IReadOnlyList<ISong>`**
   The interface returns a mutable `List<ISong>` which is inconsistent with the `IReadOnlyList` pattern used elsewhere (`ISongList.SongCollection`, `ISongSources.Sources`). Return `IReadOnlyList<ISong>` for consistency.
 
 ### Low Priority
 
-- [ ] **`JukeboxEngine` tests rely on `OperationCanceledException` to break the loop — fragile pattern**
+- [x] **`JukeboxEngine` tests rely on `OperationCanceledException` to break the loop — fragile pattern**
   Every engine test throws `OperationCanceledException` from a mock to exit the `while` loop. Now that the engine supports a proper `Exit` state via "q", tests could use `consoleMock.Setup(x => x.ReadLine()).Returns("q")` for a cleaner exit on the second call instead of throwing.
 
-- [ ] **No `Usings.cs` file in `JukeboxDomain.Test` for global usings**
+- [x] **No `Usings.cs` file in `JukeboxDomain.Test` for global usings**
   `JukeboxLibrary.Test` has a `<Using Include="Xunit" />` in its csproj and a `Usings.cs` file, but `JukeboxDomain.Test` has neither. Adding a global `using Xunit;` would remove the need for implicit `[Fact]` resolution and keep the projects consistent.
 
-- [ ] **`SongSources` constructor performs I/O (directory scanning) — slows DI resolution**
+- [x] **`SongSources` constructor performs I/O (directory scanning) — slows DI resolution**
   The constructor calls `DisplaySongCounts()` which scans the file system. This means DI container resolution triggers potentially slow I/O. Consider making the count display lazy (called on first use or via an explicit `Initialize()` method) so the app starts faster.
 
-- [ ] **`JukeboxEngine` could benefit from a `CancellationToken` for cooperative shutdown**
+- [x] **`JukeboxEngine` could benefit from a `CancellationToken` for cooperative shutdown**
   The engine currently relies on the "q" command to exit. If the app needs to be stopped programmatically (e.g. from a signal handler or test), there's no mechanism. Adding a `CancellationToken` parameter to `Start()` would enable graceful external shutdown.
 
-- [ ] **Solution file still references old-style project GUIDs (`FAE04EC0-...`) for test projects**
+- [x] **Solution file still references old-style project GUIDs (`FAE04EC0-...`) for test projects**
   The test projects use the legacy project type GUID (`FAE04EC0-301F-11D3-BF4B-00C04F79EFBC`) while the main projects use the SDK-style GUID (`9A19103F-16F7-4668-BE54-9A1E7A4F7556`). This is cosmetic and doesn't affect builds, but normalizing them would clean up the solution file.

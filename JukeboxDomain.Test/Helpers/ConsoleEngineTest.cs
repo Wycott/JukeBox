@@ -11,14 +11,22 @@ public class ConsoleEngineTest
     {
         // Arrange
         var consoleEngine = new ConsoleEngine();
+        var originalOut = Console.Out;
         var output = new StringWriter();
         Console.SetOut(output);
 
-        // Act
-        consoleEngine.WriteALine("Test message");
+        try
+        {
+            // Act
+            consoleEngine.WriteALine("Test message");
 
-        // Assert
-        Assert.Equal("Test message\r\n", output.ToString());
+            // Assert
+            Assert.Equal("Test message\r\n", output.ToString());
+        }
+        finally
+        {
+            Console.SetOut(originalOut);
+        }
     }
 
     [Fact]
@@ -26,14 +34,22 @@ public class ConsoleEngineTest
     {
         // Arrange
         var consoleEngine = new ConsoleEngine();
+        var originalOut = Console.Out;
         var output = new StringWriter();
         Console.SetOut(output);
 
-        // Act
-        consoleEngine.WriteALine();
+        try
+        {
+            // Act
+            consoleEngine.WriteALine();
 
-        // Assert
-        Assert.Equal("\r\n", output.ToString());
+            // Assert
+            Assert.Equal("\r\n", output.ToString());
+        }
+        finally
+        {
+            Console.SetOut(originalOut);
+        }
     }
 
     [Fact]
@@ -41,14 +57,22 @@ public class ConsoleEngineTest
     {
         // Arrange
         var consoleEngine = new ConsoleEngine();
+        var originalOut = Console.Out;
         var output = new StringWriter();
         Console.SetOut(output);
 
-        // Act
-        consoleEngine.WriteText("Test");
+        try
+        {
+            // Act
+            consoleEngine.WriteText("Test");
 
-        // Assert
-        Assert.Equal("Test", output.ToString());
+            // Assert
+            Assert.Equal("Test", output.ToString());
+        }
+        finally
+        {
+            Console.SetOut(originalOut);
+        }
     }
 
     [Fact]
@@ -71,13 +95,21 @@ public class ConsoleEngineTest
     {
         // Arrange
         var consoleEngine = new ConsoleEngine();
+        var originalIn = Console.In;
         var input = new StringReader("Test input\n");
         Console.SetIn(input);
 
-        // Act
-        var result = consoleEngine.ReadLine();
+        try
+        {
+            // Act
+            var result = consoleEngine.ReadLine();
 
-        // Assert
-        Assert.Equal("Test input", result);
+            // Assert
+            Assert.Equal("Test input", result);
+        }
+        finally
+        {
+            Console.SetIn(originalIn);
+        }
     }
 }

@@ -4,7 +4,7 @@ namespace JukeboxDomain.Helpers;
 
 public class FileSystemParser : IFileSystemParser
 {
-    public List<ISong> ParseFileSystem(ISongSources mediaDrives, string huntString)
+    public IReadOnlyList<ISong> ParseFileSystem(ISongSources mediaDrives, string huntString)
     {
         var retVal = new List<ISong>();
         var artist = GetArtist(huntString);
@@ -21,6 +21,14 @@ public class FileSystemParser : IFileSystemParser
                 directories = Directory.GetDirectories(drive);
             }
             catch (DirectoryNotFoundException)
+            {
+                continue;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                continue;
+            }
+            catch (IOException)
             {
                 continue;
             }
@@ -44,6 +52,10 @@ public class FileSystemParser : IFileSystemParser
                 catch (UnauthorizedAccessException)
                 {
                     // Standard...
+                }
+                catch (IOException)
+                {
+                    // Network or I/O issue with subdirectory
                 }
             }
         }
