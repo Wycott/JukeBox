@@ -2,20 +2,15 @@
 
 namespace JukeboxDomain.Helpers;
 
-public class Display : IDisplay
+public class Display(IConsoleEngine consoleEngine) : IDisplay
 {
-    private IConsoleEngine ConsoleEngine { get; }
+    private IConsoleEngine ConsoleEngine { get; } = consoleEngine;
 
-    public Display(IConsoleEngine consoleEngine)
-    {
-        ConsoleEngine = consoleEngine;
-    }
-
-    private int _currentColour;
+    private int currentColour;
 
     // Yes, could have enumerated console colours but some of them aren't very bright
     private static readonly ConsoleColor[] BrightColours =
-    {
+    [
         ConsoleColor.Blue,
         ConsoleColor.Green,
         ConsoleColor.Cyan,
@@ -23,7 +18,7 @@ public class Display : IDisplay
         ConsoleColor.Magenta,
         ConsoleColor.Yellow,
         ConsoleColor.White
-    };
+    ];
 
     public void FlowerBox()
     {
@@ -44,6 +39,7 @@ public class Display : IDisplay
         Write("Found: ");
         WriteYellowText(candidate);
         Write("Play y/n? ");
+        
         var consoleInput = ConsoleEngine.ReadAKey();
         ConsoleEngine.WriteALine();
 
@@ -63,12 +59,14 @@ public class Display : IDisplay
     public void WriteError(string errorMessage)
     {
         WriteColourText(errorMessage, ConsoleColor.Red);
+
         ConsoleEngine.WriteALine();
     }
 
     private void WriteColourText(string data, ConsoleColor colour)
     {
         var currentConsoleColour = ConsoleEngine.TextColour;
+
         ConsoleEngine.TextColour = colour;
         ConsoleEngine.WriteALine(data);
         ConsoleEngine.TextColour = currentConsoleColour;
@@ -109,17 +107,17 @@ public class Display : IDisplay
 
         foreach (var c in line)
         {
-            ConsoleEngine.TextColour = BrightColours[_currentColour];
+            ConsoleEngine.TextColour = BrightColours[currentColour];
             ConsoleEngine.WriteText(c.ToString());
 
             if (c != ' ')
             {
-                _currentColour++;
+                currentColour++;
             }
 
-            if (_currentColour == BrightColours.Length)
+            if (currentColour == BrightColours.Length)
             {
-                _currentColour = 0;
+                currentColour = 0;
             }
         }
 

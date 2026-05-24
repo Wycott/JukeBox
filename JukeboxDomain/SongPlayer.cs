@@ -3,17 +3,12 @@ using NAudio.Wave;
 
 namespace JukeboxDomain;
 
-public class SongPlayer : ISongPlayer, IDisposable
+public class SongPlayer(IDisplay displayEngine) : ISongPlayer, IDisposable
 {
     private Mp3FileReader? FileReader { get; set; }
     private WaveOutEvent? Player { get; set; }
 
-    private IDisplay DisplayEngine { get; }
-
-    public SongPlayer(IDisplay displayEngine)
-    {
-        DisplayEngine = displayEngine;
-    }
+    private IDisplay DisplayEngine { get; } = displayEngine;
 
     public void PlaySong(string filename)
     {

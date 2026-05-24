@@ -2,19 +2,12 @@
 
 namespace JukeboxDomain;
 
-public class SongList : ISongList
+public class SongList(IFileSystemParser fileSystemParser) : ISongList
 {
-    private readonly IFileSystemParser _fileSystemParser;
-
     public IReadOnlyList<ISong> SongCollection { get; private set; } = [];
-
-    public SongList(IFileSystemParser fileSystemParser)
-    {
-        _fileSystemParser = fileSystemParser;
-    }
 
     public void Build(ISongSources sources, string selectedPattern)
     {
-        SongCollection = _fileSystemParser.ParseFileSystem(sources, selectedPattern);
+        SongCollection = fileSystemParser.ParseFileSystem(sources, selectedPattern);
     }
 }

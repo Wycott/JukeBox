@@ -4,29 +4,30 @@ namespace JukeboxDomain.Test;
 
 public class FavouritesTest : IDisposable
 {
-    private readonly string _tempFile;
+    private readonly string tempFile;
 
     public FavouritesTest()
     {
-        _tempFile = Path.Combine(Path.GetTempPath(), $"favourites_test_{Guid.NewGuid():N}.json");
+        tempFile = Path.Combine(Path.GetTempPath(), $"favourites_test_{Guid.NewGuid():N}.json");
     }
 
     public void Dispose()
     {
-        if (File.Exists(_tempFile))
+        if (File.Exists(tempFile))
         {
-            File.Delete(_tempFile);
+            File.Delete(tempFile);
         }
     }
 
     [Fact]
     public void RecordPlay_NewSong_SetsCountToOne()
     {
-        var favourites = new Favourites(_tempFile);
+        var favourites = new Favourites(tempFile);
 
         favourites.RecordPlay(@"C:\Music\song.mp3");
 
         var top = favourites.GetTopFavourites();
+
         Assert.Single(top);
         Assert.Equal(1, top[0].PlayCount);
         Assert.Equal(@"C:\Music\song.mp3", top[0].FullPath);
@@ -35,13 +36,14 @@ public class FavouritesTest : IDisposable
     [Fact]
     public void RecordPlay_ExistingSong_IncrementsCount()
     {
-        var favourites = new Favourites(_tempFile);
+        var favourites = new Favourites(tempFile);
 
         favourites.RecordPlay(@"C:\Music\song.mp3");
         favourites.RecordPlay(@"C:\Music\song.mp3");
         favourites.RecordPlay(@"C:\Music\song.mp3");
 
         var top = favourites.GetTopFavourites();
+
         Assert.Single(top);
         Assert.Equal(3, top[0].PlayCount);
     }
@@ -49,11 +51,11 @@ public class FavouritesTest : IDisposable
     [Fact]
     public void RecordPlay_PersistsToDisk()
     {
-        var favourites = new Favourites(_tempFile);
+        var favourites = new Favourites(tempFile);
         favourites.RecordPlay(@"C:\Music\song.mp3");
 
         // Load a new instance from the same file
-        var reloaded = new Favourites(_tempFile);
+        var reloaded = new Favourites(tempFile);
         var top = reloaded.GetTopFavourites();
 
         Assert.Single(top);
@@ -63,7 +65,7 @@ public class FavouritesTest : IDisposable
     [Fact]
     public void GetTopFavourites_ReturnsInDescendingOrder()
     {
-        var favourites = new Favourites(_tempFile);
+        var favourites = new Favourites(tempFile);
 
         favourites.RecordPlay(@"C:\Music\a.mp3");
         favourites.RecordPlay(@"C:\Music\b.mp3");
@@ -86,7 +88,7 @@ public class FavouritesTest : IDisposable
     [Fact]
     public void GetTopFavourites_WhenEmpty_ReturnsEmptyList()
     {
-        var favourites = new Favourites(_tempFile);
+        var favourites = new Favourites(tempFile);
 
         var top = favourites.GetTopFavourites();
 
@@ -96,7 +98,7 @@ public class FavouritesTest : IDisposable
     [Fact]
     public void GetRandomFavourite_WhenEmpty_ReturnsNull()
     {
-        var favourites = new Favourites(_tempFile);
+        var favourites = new Favourites(tempFile);
 
         var result = favourites.GetRandomFavourite();
 
@@ -106,7 +108,7 @@ public class FavouritesTest : IDisposable
     [Fact]
     public void GetRandomFavourite_WithEntries_ReturnsValidEntry()
     {
-        var favourites = new Favourites(_tempFile);
+        var favourites = new Favourites(tempFile);
         favourites.RecordPlay(@"C:\Music\song.mp3");
 
         var result = favourites.GetRandomFavourite();
@@ -119,7 +121,7 @@ public class FavouritesTest : IDisposable
     [Fact]
     public void Trim_KeepsOnlyMaxFavourites()
     {
-        var favourites = new Favourites(_tempFile, maxFavourites: 3);
+        var favourites = new Favourites(tempFile, maxFavourites: 3);
 
         // Build up 4 songs — each with distinct play counts higher than the next
         // d=4, c=3, b=2, a=1 — but we add them in order so trim happens correctly
@@ -143,7 +145,7 @@ public class FavouritesTest : IDisposable
     [Fact]
     public void Trim_KeepsHighestPlayCounts()
     {
-        var favourites = new Favourites(_tempFile, maxFavourites: 2);
+        var favourites = new Favourites(tempFile, maxFavourites: 2);
 
         // Build up 3 songs with distinct counts, then the 3rd triggers trim
         favourites.RecordPlay(@"C:\Music\popular.mp3");
@@ -163,9 +165,9 @@ public class FavouritesTest : IDisposable
     [Fact]
     public void Load_WithCorruptJson_ReturnsEmptyDictionary()
     {
-        File.WriteAllText(_tempFile, "not valid json {{{");
+        File.WriteAllText(tempFile, "not valid json {{{");
 
-        var favourites = new Favourites(_tempFile);
+        var favourites = new Favourites(tempFile);
         var top = favourites.GetTopFavourites();
 
         Assert.Empty(top);
@@ -183,7 +185,7 @@ public class FavouritesTest : IDisposable
     [Fact]
     public void RecordPlay_MultipleSongs_AllTracked()
     {
-        var favourites = new Favourites(_tempFile);
+        var favourites = new Favourites(tempFile);
 
         favourites.RecordPlay(@"C:\Music\one.mp3");
         favourites.RecordPlay(@"C:\Music\two.mp3");

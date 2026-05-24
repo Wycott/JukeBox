@@ -8,19 +8,19 @@ namespace JukeboxDomain.Test.Helpers;
 [AiGenerated]
 public class FileSystemParserTest : IDisposable
 {
-    private readonly string _testRoot;
+    private readonly string testRoot;
 
     public FileSystemParserTest()
     {
-        _testRoot = Path.Combine(Path.GetTempPath(), "JukeboxTest_" + Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(_testRoot);
+        testRoot = Path.Combine(Path.GetTempPath(), "JukeboxTest_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(testRoot);
     }
 
     public void Dispose()
     {
-        if (Directory.Exists(_testRoot))
+        if (Directory.Exists(testRoot))
         {
-            Directory.Delete(_testRoot, recursive: true);
+            Directory.Delete(testRoot, recursive: true);
         }
     }
 
@@ -28,14 +28,14 @@ public class FileSystemParserTest : IDisposable
     public void ParseFileSystem_WithMatchingFiles_ReturnsSongs()
     {
         // Arrange
-        var artistDir = Path.Combine(_testRoot, "Artist");
+        var artistDir = Path.Combine(testRoot, "Artist");
         Directory.CreateDirectory(artistDir);
         File.WriteAllText(Path.Combine(artistDir, "test_song.mp3"), "");
         File.WriteAllText(Path.Combine(artistDir, "other.txt"), "");
 
         var parser = new FileSystemParser();
         var songSourcesMock = new Mock<ISongSources>();
-        songSourcesMock.Setup(x => x.Sources).Returns(new List<string> { _testRoot + Path.DirectorySeparatorChar });
+        songSourcesMock.Setup(x => x.Sources).Returns(new List<string> { testRoot + Path.DirectorySeparatorChar });
 
         // Act
         var result = parser.ParseFileSystem(songSourcesMock.Object, "test");
@@ -49,13 +49,13 @@ public class FileSystemParserTest : IDisposable
     public void ParseFileSystem_WithM4aFiles_ReturnsSongs()
     {
         // Arrange
-        var artistDir = Path.Combine(_testRoot, "Artist");
+        var artistDir = Path.Combine(testRoot, "Artist");
         Directory.CreateDirectory(artistDir);
         File.WriteAllText(Path.Combine(artistDir, "track.m4a"), "");
 
         var parser = new FileSystemParser();
         var songSourcesMock = new Mock<ISongSources>();
-        songSourcesMock.Setup(x => x.Sources).Returns(new List<string> { _testRoot + Path.DirectorySeparatorChar });
+        songSourcesMock.Setup(x => x.Sources).Returns(new List<string> { testRoot + Path.DirectorySeparatorChar });
 
         // Act
         var result = parser.ParseFileSystem(songSourcesMock.Object, "track");
@@ -69,8 +69,8 @@ public class FileSystemParserTest : IDisposable
     public void ParseFileSystem_WithArtistMarker_FiltersToArtistDirectory()
     {
         // Arrange
-        var matchDir = Path.Combine(_testRoot, "Bon Jovi");
-        var otherDir = Path.Combine(_testRoot, "Metallica");
+        var matchDir = Path.Combine(testRoot, "Bon Jovi");
+        var otherDir = Path.Combine(testRoot, "Metallica");
         Directory.CreateDirectory(matchDir);
         Directory.CreateDirectory(otherDir);
         File.WriteAllText(Path.Combine(matchDir, "livin.mp3"), "");
@@ -78,7 +78,7 @@ public class FileSystemParserTest : IDisposable
 
         var parser = new FileSystemParser();
         var songSourcesMock = new Mock<ISongSources>();
-        songSourcesMock.Setup(x => x.Sources).Returns(new List<string> { _testRoot + Path.DirectorySeparatorChar });
+        songSourcesMock.Setup(x => x.Sources).Returns(new List<string> { testRoot + Path.DirectorySeparatorChar });
 
         // Act
         var result = parser.ParseFileSystem(songSourcesMock.Object, "@Bon Jovi");
@@ -92,13 +92,13 @@ public class FileSystemParserTest : IDisposable
     public void ParseFileSystem_WithNoMatchingFiles_ReturnsEmpty()
     {
         // Arrange
-        var artistDir = Path.Combine(_testRoot, "Artist");
+        var artistDir = Path.Combine(testRoot, "Artist");
         Directory.CreateDirectory(artistDir);
         File.WriteAllText(Path.Combine(artistDir, "song.mp3"), "");
 
         var parser = new FileSystemParser();
         var songSourcesMock = new Mock<ISongSources>();
-        songSourcesMock.Setup(x => x.Sources).Returns(new List<string> { _testRoot + Path.DirectorySeparatorChar });
+        songSourcesMock.Setup(x => x.Sources).Returns(new List<string> { testRoot + Path.DirectorySeparatorChar });
 
         // Act
         var result = parser.ParseFileSystem(songSourcesMock.Object, "zzzznotfound");
@@ -142,12 +142,12 @@ public class FileSystemParserTest : IDisposable
     public void ParseFileSystem_SetsCorrectShortenedPath()
     {
         // Arrange
-        var artistDir = Path.Combine(_testRoot, "Artist");
+        var artistDir = Path.Combine(testRoot, "Artist");
         Directory.CreateDirectory(artistDir);
         File.WriteAllText(Path.Combine(artistDir, "song.mp3"), "");
 
         var parser = new FileSystemParser();
-        var sourceWithSeparator = _testRoot + Path.DirectorySeparatorChar;
+        var sourceWithSeparator = testRoot + Path.DirectorySeparatorChar;
         var songSourcesMock = new Mock<ISongSources>();
         songSourcesMock.Setup(x => x.Sources).Returns(new List<string> { sourceWithSeparator });
 
@@ -163,7 +163,7 @@ public class FileSystemParserTest : IDisposable
     public void ParseFileSystem_IgnoresNonMusicExtensions()
     {
         // Arrange
-        var artistDir = Path.Combine(_testRoot, "Artist");
+        var artistDir = Path.Combine(testRoot, "Artist");
         Directory.CreateDirectory(artistDir);
         File.WriteAllText(Path.Combine(artistDir, "readme.txt"), "");
         File.WriteAllText(Path.Combine(artistDir, "cover.jpg"), "");
@@ -171,7 +171,7 @@ public class FileSystemParserTest : IDisposable
 
         var parser = new FileSystemParser();
         var songSourcesMock = new Mock<ISongSources>();
-        songSourcesMock.Setup(x => x.Sources).Returns(new List<string> { _testRoot + Path.DirectorySeparatorChar });
+        songSourcesMock.Setup(x => x.Sources).Returns(new List<string> { testRoot + Path.DirectorySeparatorChar });
 
         // Act
         var result = parser.ParseFileSystem(songSourcesMock.Object, "*");

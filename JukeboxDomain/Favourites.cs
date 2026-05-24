@@ -5,9 +5,9 @@ namespace JukeboxDomain;
 
 public class Favourites : IFavourites
 {
-    private readonly int _maxFavourites;
-    private readonly string _filePath;
-    private Dictionary<string, int> _playCounts;
+    private readonly int maxFavourites;
+    private readonly string filePath;
+    private Dictionary<string, int> playCounts;
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -16,20 +16,20 @@ public class Favourites : IFavourites
 
     public Favourites(string filePath, int maxFavourites = 100)
     {
-        _filePath = filePath;
-        _maxFavourites = maxFavourites;
-        _playCounts = Load();
+        this.filePath = filePath;
+        this.maxFavourites = maxFavourites;
+        playCounts = Load();
     }
 
     public void RecordPlay(string fullPath)
     {
-        if (_playCounts.ContainsKey(fullPath))
+        if (playCounts.ContainsKey(fullPath))
         {
-            _playCounts[fullPath]++;
+            playCounts[fullPath]++;
         }
         else
         {
-            _playCounts[fullPath] = 1;
+            playCounts[fullPath] = 1;
         }
 
         Trim();
@@ -38,7 +38,7 @@ public class Favourites : IFavourites
 
     public IReadOnlyList<FavouriteEntry> GetTopFavourites()
     {
-        return _playCounts
+        return playCounts
             .OrderByDescending(kvp => kvp.Value)
             .Select(kvp => new FavouriteEntry(kvp.Key, kvp.Value))
             .ToList();
@@ -46,28 +46,28 @@ public class Favourites : IFavourites
 
     public FavouriteEntry? GetRandomFavourite()
     {
-        if (_playCounts.Count == 0)
+        if (playCounts.Count == 0)
         {
             return null;
         }
 
-        var entries = _playCounts.Keys.ToList();
+        var entries = playCounts.Keys.ToList();
         var index = Random.Shared.Next(entries.Count);
         var key = entries[index];
 
-        return new FavouriteEntry(key, _playCounts[key]);
+        return new FavouriteEntry(key, playCounts[key]);
     }
 
     private void Trim()
     {
-        if (_playCounts.Count <= _maxFavourites)
+        if (playCounts.Count <= maxFavourites)
         {
             return;
         }
 
-        _playCounts = _playCounts
+        playCounts = playCounts
             .OrderByDescending(kvp => kvp.Value)
-            .Take(_maxFavourites)
+            .Take(maxFavourites)
             .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
     }
 
@@ -75,8 +75,8 @@ public class Favourites : IFavourites
     {
         try
         {
-            var json = JsonSerializer.Serialize(_playCounts, JsonOptions);
-            File.WriteAllText(_filePath, json);
+            var json = JsonSerializer.Serialize(playCounts, JsonOptions);
+            File.WriteAllText(filePath, json);
         }
         catch (IOException)
         {
@@ -88,12 +88,13 @@ public class Favourites : IFavourites
     {
         try
         {
-            if (!File.Exists(_filePath))
+            if (!File.Exists(filePath))
             {
                 return new Dictionary<string, int>();
             }
 
-            var json = File.ReadAllText(_filePath);
+            var json = File.ReadAllText(filePath);
+
             return JsonSerializer.Deserialize<Dictionary<string, int>>(json) ?? new Dictionary<string, int>();
         }
         catch (Exception ex) when (ex is IOException or JsonException)

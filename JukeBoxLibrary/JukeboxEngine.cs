@@ -3,31 +3,25 @@ using JukeboxTypes;
 
 namespace JukeboxLibrary;
 
-public class JukeboxEngine : IJukeboxEngine
+public class JukeboxEngine(
+    ISongSources songSources,
+    ISongList songList,
+    ISongPlayer songPlayer,
+    IDisplay displayEngine,
+    IConsoleEngine consoleEngine,
+    IFavourites favourites,
+    int favouritesPageSize = 20)
+    : IJukeboxEngine
 {
-    private IConsoleEngine ConsoleEngine { get; }
-    private ISongSources SongSources { get; }
-    private ISongList SongList { get; }
-    private ISongPlayer SongPlayer { get; }
-    private IDisplay DisplayEngine { get; }
-    private IFavourites Favourites { get; }
+    private IConsoleEngine ConsoleEngine { get; } = consoleEngine;
+    private ISongSources SongSources { get; } = songSources;
+    private ISongList SongList { get; } = songList;
+    private ISongPlayer SongPlayer { get; } = songPlayer;
+    private IDisplay DisplayEngine { get; } = displayEngine;
+    private IFavourites Favourites { get; } = favourites;
 
-    private string _lastPattern = string.Empty;
-    private bool _inFavouritesMode;
-    private readonly int _favouritesPageSize;
-
-    public JukeboxEngine(ISongSources songSources, ISongList songList, ISongPlayer songPlayer,
-        IDisplay displayEngine, IConsoleEngine consoleEngine, IFavourites favourites,
-        int favouritesPageSize = 20)
-    {
-        ConsoleEngine = consoleEngine;
-        SongSources = songSources;
-        SongList = songList;
-        SongPlayer = songPlayer;
-        DisplayEngine = displayEngine;
-        Favourites = favourites;
-        _favouritesPageSize = favouritesPageSize;
-    }
+    private string lastPattern = string.Empty;
+    private bool inFavouritesMode;
 
     public void Start(CancellationToken cancellationToken = default)
     {
@@ -148,22 +142,22 @@ public class JukeboxEngine : IJukeboxEngine
 
         if (string.Equals(input, ":f", StringComparison.OrdinalIgnoreCase))
         {
-            _inFavouritesMode = true;
+            inFavouritesMode = true;
             selectedPattern = string.Empty;
             return PlayRandomFavourite(out selectedSong);
         }
 
         if (string.Equals(input, ":n", StringComparison.OrdinalIgnoreCase))
         {
-            if (_inFavouritesMode)
+            if (inFavouritesMode)
             {
                 selectedPattern = string.Empty;
                 return PlayRandomFavourite(out selectedSong);
             }
 
-            if (_lastPattern.Length > 0)
+            if (lastPattern.Length > 0)
             {
-                selectedPattern = _lastPattern;
+                selectedPattern = lastPattern;
                 return JukeboxStateType.FindSong;
             }
 
@@ -174,8 +168,8 @@ public class JukeboxEngine : IJukeboxEngine
 
         if (!string.IsNullOrWhiteSpace(input))
         {
-            _inFavouritesMode = false;
-            _lastPattern = input;
+            inFavouritesMode = false;
+            lastPattern = input;
             selectedPattern = input;
             return JukeboxStateType.FindSong;
         }
@@ -191,7 +185,7 @@ public class JukeboxEngine : IJukeboxEngine
         if (favourite == null)
         {
             DisplayEngine.WriteError("No favourites yet");
-            _inFavouritesMode = false;
+            inFavouritesMode = false;
             selectedSong = string.Empty;
             return JukeboxStateType.RequestSong;
         }
@@ -222,7 +216,7 @@ public class JukeboxEngine : IJukeboxEngine
             DisplayEngine.WriteYellowText($"  {entry.PlayCount}x  {fileName}");
             displayed++;
 
-            if (displayed % _favouritesPageSize == 0 && displayed < favourites.Count)
+            if (displayed % favouritesPageSize == 0 && displayed < favourites.Count)
             {
                 ConsoleEngine.WriteText("-- More (any key) or q to stop --");
                 var key = ConsoleEngine.ReadAKey();

@@ -2,32 +2,25 @@
 
 namespace JukeboxDomain;
 
-public class SongSources : ISongSources
+public class SongSources(IDisplay display, List<string> sources) : ISongSources
 {
-    private readonly IDisplay _display;
-    private bool _songCountsDisplayed;
+    private bool songCountsDisplayed;
 
-    public IReadOnlyList<string> Sources { get; }
-
-    public SongSources(IDisplay display, List<string> sources)
-    {
-        _display = display;
-        Sources = sources;
-    }
+    public IReadOnlyList<string> Sources { get; } = sources;
 
     public void DisplaySongCounts()
     {
-        if (_songCountsDisplayed)
+        if (songCountsDisplayed)
         {
             return;
         }
 
-        _songCountsDisplayed = true;
+        songCountsDisplayed = true;
 
         foreach (var source in Sources)
         {
             var count = CountSongsInSource(source);
-            _display.WriteYellowText($"{source}: {count} songs");
+            display.WriteYellowText($"{source}: {count} songs");
         }
     }
 
@@ -39,6 +32,7 @@ public class SongSources : ISongSources
         try
         {
             var directories = Directory.GetDirectories(source);
+
             foreach (var directory in directories)
             {
                 try
