@@ -25,7 +25,9 @@ public class SongPlayer : ISongPlayer, IDisposable
             Player.Init(FileReader);
             Player.Play();
         }
-        catch (InvalidOperationException)
+        catch (Exception ex) when (ex is InvalidOperationException
+                                       or FileNotFoundException
+                                       or ArgumentException)
         {
             DisplayEngine.WriteError("Internal error - please pick another song");
         }

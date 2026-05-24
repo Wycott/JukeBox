@@ -33,22 +33,22 @@
 
 ## Medium Priority
 
-- [ ] **Dead project: `JukeboxHelpers` contains only commented-out code**
+- [x] **Dead project: `JukeboxHelpers` contains only commented-out code**
   The `JukeboxHelpers` project has all code commented out — it was clearly superseded by `JukeboxDomain.Helpers`. It's still on disk (though not in the solution file). Remove the folder entirely to avoid confusion.
 
-- [ ] **`JukeboxDomain.Test` project references `JukeBoxLibrary` but doesn't test it**
+- [x] **`JukeboxDomain.Test` project references `JukeBoxLibrary` but doesn't test it**
   The test csproj has a `ProjectReference` to `JukeboxLibrary` that appears unnecessary. The tests in this project only cover domain classes. Remove the unused reference.
 
-- [ ] **Duplicate `DisplayTest` class exists in both test projects**
+- [x] **Duplicate `DisplayTest` class exists in both test projects**
   `JukeboxLibrary.Test\Helpers\DisplayTest.cs` and `JukeboxDomain.Test\Helpers\DisplayTest.cs` contain identical tests. Remove the one in `JukeboxLibrary.Test` since `Display` lives in `JukeboxDomain`.
 
-- [ ] **No test coverage for `SongPlayer` or `SongList`**
+- [x] **No test coverage for `SongPlayer` or `SongList`**
   `SongPlayer` has audio playback logic and error handling that is completely untested. `SongList` is trivial but also untested. At minimum, verify that `PlaySong` handles missing files gracefully and that `SongList.Build` delegates correctly.
 
-- [ ] **GitHub Actions workflow uses deprecated `actions/checkout@v1`**
+- [x] **GitHub Actions workflow uses deprecated `actions/checkout@v1`**
   `dotnet.yml` uses `actions/checkout@v1` which is outdated and slower (uses git REST API instead of git commands). Update to `actions/checkout@v4`.
 
-- [ ] **GitHub Actions workflow uses `$Env:` PowerShell syntax in `env:` block**
+- [x] **GitHub Actions workflow uses `$Env:` PowerShell syntax in `env:` block**
   The `SOLUTION_FILE` env var is set as `$Env:GITHUB_WORKSPACE\JukeBox.sln` which uses PowerShell syntax. In the `env:` context of a workflow file this should be `${{ github.workspace }}\JukeBox.sln` or the steps should reference it differently. This may cause build failures.
 
 ## Low Priority

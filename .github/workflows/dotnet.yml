@@ -5,27 +5,24 @@ on:
     paths-ignore:
       - 'README.md'
 
-env:
-  SOLUTION_FILE: $Env:GITHUB_WORKSPACE\JukeBox.sln
-
 jobs:
   build:
     runs-on: [windows-latest]
     steps:
         
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
 
       - name: Setup .NET 10 SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'  # Targeting .NET 10
+          dotnet-version: '10.0.x'
         
       - name: NuGet Restore
-        run: dotnet restore $SOLUTION_FILE
+        run: dotnet restore JukeBox.sln
                            
       - name: Build
-        run: dotnet build $SOLUTION_FILE
+        run: dotnet build JukeBox.sln
            
       - name: Run Tests
-        run: dotnet test -v n $SOLUTION_FILE
+        run: dotnet test -v n JukeBox.sln
