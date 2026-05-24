@@ -80,15 +80,4 @@ public class ConsoleEngineTest
         // Assert
         Assert.Equal("Test input", result);
     }
-
-    [Fact]
-    public void ReadAKey_ReturnsConsoleKeyInfo()
-    {
-        // Arrange
-        var consoleEngine = new ConsoleEngine();
-
-        // Act & Assert - Just verify the method exists and returns ConsoleKeyInfo type
-        // Note: Cannot easily test ReadAKey without mocking Console.ReadKey
-        Assert.NotNull(consoleEngine);
-    }
 }

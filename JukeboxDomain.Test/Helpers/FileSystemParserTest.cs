@@ -1,5 +1,4 @@
 using AiAnnotations;
-using JukeboxDomain;
 using JukeboxDomain.Helpers;
 using JukeboxInterfaces;
 using Moq;
@@ -10,14 +9,15 @@ namespace JukeboxDomain.Test.Helpers;
 public class FileSystemParserTest
 {
     [Fact]
-    public void WhenParseFileSystemIsCalled_WithValidPattern_ThenSongsAreReturned()
+    public void ParseFileSystem_WithValidPattern_ReturnsResults()
     {
         // Arrange
+        var parser = new FileSystemParser();
         var songSourcesMock = new Mock<ISongSources>();
         songSourcesMock.Setup(x => x.Sources).Returns(new List<string> { "C:\\" });
 
         // Act
-        var result = FileSystemParser.ParseFileSystem(songSourcesMock.Object, "test");
+        var result = parser.ParseFileSystem(songSourcesMock.Object, "test");
 
         // Assert
         Assert.NotNull(result);
@@ -25,14 +25,15 @@ public class FileSystemParserTest
     }
 
     [Fact]
-    public void WhenParseFileSystemIsCalled_WithArtistMarker_ThenResultsAreRandomized()
+    public void ParseFileSystem_WithArtistMarker_ReturnsResults()
     {
         // Arrange
+        var parser = new FileSystemParser();
         var songSourcesMock = new Mock<ISongSources>();
         songSourcesMock.Setup(x => x.Sources).Returns(new List<string>());
 
         // Act
-        var result = FileSystemParser.ParseFileSystem(songSourcesMock.Object, "*@Jovi");
+        var result = parser.ParseFileSystem(songSourcesMock.Object, "*@Jovi");
 
         // Assert
         Assert.NotNull(result);
@@ -40,14 +41,15 @@ public class FileSystemParserTest
     }
 
     [Fact]
-    public void WhenParseFileSystemIsCalled_WithInvalidDirectory_ThenContinuesProcessing()
+    public void ParseFileSystem_WithInvalidDirectory_ReturnsEmpty()
     {
         // Arrange
+        var parser = new FileSystemParser();
         var songSourcesMock = new Mock<ISongSources>();
         songSourcesMock.Setup(x => x.Sources).Returns(new List<string> { "Z:\\" });
 
         // Act
-        var result = FileSystemParser.ParseFileSystem(songSourcesMock.Object, "test");
+        var result = parser.ParseFileSystem(songSourcesMock.Object, "test");
 
         // Assert
         Assert.NotNull(result);

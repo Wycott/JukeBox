@@ -2,5 +2,5 @@
 
 public interface ISongSources
 {
-    List<string> Sources { get; set; }
+    IReadOnlyList<string> Sources { get; }
 }

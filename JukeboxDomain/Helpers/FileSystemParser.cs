@@ -2,16 +2,15 @@
 
 namespace JukeboxDomain.Helpers;
 
-public static class FileSystemParser
+public class FileSystemParser : IFileSystemParser
 {
-    public static List<ISong> ParseFileSystem(ISongSources mediaDrives, string huntString)
+    public List<ISong> ParseFileSystem(ISongSources mediaDrives, string huntString)
     {
         var retVal = new List<ISong>();
         var artist = GetArtist(huntString);
 
         var haveArtist = artist.Length > 0;
 
-        // TODO: Maybe do this elsewhere
         huntString = artist.Length > 0 ? "*" : PreparePattern(huntString);
 
         foreach (var drive in mediaDrives.Sources)
@@ -37,7 +36,7 @@ public static class FileSystemParser
                             if (!haveArtist || HaveASongByThisArtist(possibleSongFile, artist))
                             {
                                 var shortPath = possibleSongFile.Replace(drive, "");
-                                retVal.Add(new Song() { FullPath = possibleSongFile, ShortenedPath = shortPath });
+                                retVal.Add(new Song { FullPath = possibleSongFile, ShortenedPath = shortPath });
                             }
                         }
                     }
@@ -52,7 +51,7 @@ public static class FileSystemParser
         return haveArtist ? retVal.OrderBy(_ => Guid.NewGuid()).ToList() : retVal;
     }
 
-    private static readonly string[] ValidExtensions = { ".mp3", ".m4a" };
+    private static readonly string[] ValidExtensions = [".mp3", ".m4a"];
 
     private static bool ExtensionsOk(string candidate)
     {
@@ -84,6 +83,6 @@ public static class FileSystemParser
     {
         var nonSongSection = songPattern[..songPattern.LastIndexOf("\\", StringComparison.Ordinal)];
 
-        return nonSongSection.ToUpper().Contains(artist.ToUpper());
+        return nonSongSection.Contains(artist, StringComparison.OrdinalIgnoreCase);
     }
 }

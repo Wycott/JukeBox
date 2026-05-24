@@ -71,7 +71,7 @@ public class Display : IDisplay
 
     private void WriteText()
     {
-        var lines = new List<string> {
+        string[] lines = [
             "",
             " ************************************",
             " *                                  *",
@@ -80,7 +80,7 @@ public class Display : IDisplay
             " *                                  *",
             " ************************************",
             ""
-        };
+        ];
 
         WriteLines(lines, colouredText: true);
     }

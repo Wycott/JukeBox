@@ -8,27 +8,6 @@ namespace JukeboxLibrary.Test;
 public class JukeboxEngineTest
 {
     [Fact]
-    public void Constructor_InitializesAllProperties()
-    {
-        // Arrange
-        var songSourcesMock = new Mock<ISongSources>();
-        var songListMock = new Mock<ISongList>();
-        var songPlayerMock = new Mock<ISongPlayer>();
-        var displayMock = new Mock<IDisplay>();
-        var consoleMock = new Mock<IConsoleEngine>();
-
-        // Act
-        var engine = new JukeboxEngine(songSourcesMock.Object, songListMock.Object, 
-            songPlayerMock.Object, displayMock.Object, consoleMock.Object);
-
-        // Assert
-        Assert.Equal(songSourcesMock.Object, engine.SongSources);
-        Assert.Equal(songListMock.Object, engine.SongList);
-        Assert.Equal(songPlayerMock.Object, engine.SongPlayer);
-        Assert.Equal(displayMock.Object, engine.DisplayEngine);
-    }
-
-    [Fact]
     public void Start_ShowsFlowerBox()
     {
         // Arrange

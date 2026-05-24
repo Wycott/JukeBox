@@ -53,20 +53,20 @@
 
 ## Low Priority
 
-- [ ] **`ISongSources.Sources` exposes a mutable `List<string>` via the interface**
+- [x] **`ISongSources.Sources` exposes a mutable `List<string>` via the interface**
   The interface allows consumers to replace or mutate the sources list directly. Use `IReadOnlyList<string>` on the interface and expose mutation only through methods if needed.
 
-- [ ] **`ISongList.SongCollection` exposes a mutable `List<ISong>` via the interface**
+- [x] **`ISongList.SongCollection` exposes a mutable `List<ISong>` via the interface**
   Same issue — the interface exposes a settable `List<ISong>`. Prefer `IReadOnlyList<ISong>` on the interface contract.
 
-- [ ] **`FileSystemParser` is a static class making it hard to test in isolation**
+- [x] **`FileSystemParser` is a static class making it hard to test in isolation**
   The file system access is baked into a static helper with no abstraction. This makes unit testing require real directories. Consider injecting a file system abstraction or making it non-static and interface-backed.
 
-- [ ] **`JukeboxEngine` exposes all dependencies as public properties**
+- [x] **`JukeboxEngine` exposes all dependencies as public properties**
   `SongSources`, `SongList`, `SongPlayer`, and `DisplayEngine` are all public on the engine class. These are implementation details and should be private (or at most internal). The tests currently assert on them directly, which couples tests to internals.
 
-- [ ] **`ConsoleEngineTest.ReadAKey` test doesn't actually test anything**
+- [x] **`ConsoleEngineTest.ReadAKey` test doesn't actually test anything**
   The test just asserts `consoleEngine` is not null. Either remove it or use a proper approach to verify `ReadKey` behaviour (e.g. redirect stdin with a `ConsoleKeyInfo` mock).
 
-- [ ] **Collection initialisers use `new()` target-typed syntax inconsistently**
+- [x] **Collection initialisers use `new()` target-typed syntax inconsistently**
   Some places use `new List<string>()` and others use `new()`. Pick one style for consistency across the codebase.

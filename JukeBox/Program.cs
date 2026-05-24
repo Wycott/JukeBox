@@ -16,11 +16,12 @@ internal static class Program
             .AddJsonFile("appsettings.json", optional: false)
             .Build();
 
-        var songSourcePaths = configuration.GetSection("SongSources").Get<List<string>>() ?? new List<string>();
+        var songSourcePaths = configuration.GetSection("SongSources").Get<List<string>>() ?? [];
 
         var serviceProvider = new ServiceCollection()
             .AddSingleton<IConsoleEngine, ConsoleEngine>()
             .AddSingleton<IDisplay, Display>()
+            .AddSingleton<IFileSystemParser, FileSystemParser>()
             .AddSingleton<IJukeboxEngine, JukeboxEngine>()
             .AddSingleton<ISongSources>(sp => new SongSources(sp.GetRequiredService<IDisplay>(), songSourcePaths))
             .AddSingleton<ISongList, SongList>()

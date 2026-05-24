@@ -6,10 +6,10 @@ namespace JukeboxLibrary;
 public class JukeboxEngine : IJukeboxEngine
 {
     private IConsoleEngine ConsoleEngine { get; }
-    public ISongSources SongSources { get; }
-    public ISongList SongList { get; }
-    public ISongPlayer SongPlayer { get; }
-    public IDisplay DisplayEngine { get; }
+    private ISongSources SongSources { get; }
+    private ISongList SongList { get; }
+    private ISongPlayer SongPlayer { get; }
+    private IDisplay DisplayEngine { get; }
 
     public JukeboxEngine(ISongSources songSources, ISongList songList, ISongPlayer songPlayer, IDisplay displayEngine, IConsoleEngine consoleEngine)
     {

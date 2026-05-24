@@ -2,6 +2,6 @@
 
 public interface ISongList
 {
-    List<ISong> SongCollection { get; set; }
+    IReadOnlyList<ISong> SongCollection { get; }
     void Build(ISongSources sources, string selectedPattern);
 }

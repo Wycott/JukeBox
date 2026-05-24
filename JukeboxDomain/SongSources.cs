@@ -6,7 +6,7 @@ public class SongSources : ISongSources
 {
     private readonly IDisplay _display;
 
-    public List<string> Sources { get; set; } = new();
+    public IReadOnlyList<string> Sources { get; }
 
     public SongSources(IDisplay display, List<string> sources)
     {
@@ -24,7 +24,7 @@ public class SongSources : ISongSources
         }
     }
 
-    private int CountSongsInSource(string source)
+    private static int CountSongsInSource(string source)
     {
         var count = 0;
         var extensions = new[] { ".mp3", ".m4a" };
