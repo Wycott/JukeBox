@@ -10,14 +10,20 @@ public class JukeboxEngine : IJukeboxEngine
     private ISongList SongList { get; }
     private ISongPlayer SongPlayer { get; }
     private IDisplay DisplayEngine { get; }
+    private IFavourites Favourites { get; }
 
-    public JukeboxEngine(ISongSources songSources, ISongList songList, ISongPlayer songPlayer, IDisplay displayEngine, IConsoleEngine consoleEngine)
+    private string _lastPattern = string.Empty;
+    private bool _inFavouritesMode;
+
+    public JukeboxEngine(ISongSources songSources, ISongList songList, ISongPlayer songPlayer,
+        IDisplay displayEngine, IConsoleEngine consoleEngine, IFavourites favourites)
     {
         ConsoleEngine = consoleEngine;
         SongSources = songSources;
         SongList = songList;
         SongPlayer = songPlayer;
         DisplayEngine = displayEngine;
+        Favourites = favourites;
     }
 
     public void Start(CancellationToken cancellationToken = default)
@@ -40,7 +46,7 @@ public class JukeboxEngine : IJukeboxEngine
                     jukeboxState = ShowTitleBox();
                     break;
                 case JukeboxStateType.RequestSong:
-                    jukeboxState = RequestSong(out selectedPattern);
+                    jukeboxState = RequestSong(out selectedPattern, out selectedSong);
                     break;
                 case JukeboxStateType.FindSong:
                     jukeboxState = FindSong(selectedPattern);
@@ -60,6 +66,7 @@ public class JukeboxEngine : IJukeboxEngine
     private JukeboxStateType PlaySong(string selectedSong)
     {
         SongPlayer.PlaySong(selectedSong);
+        Favourites.RecordPlay(selectedSong);
 
         return JukeboxStateType.RequestSong;
     }
@@ -109,21 +116,48 @@ public class JukeboxEngine : IJukeboxEngine
         return JukeboxStateType.RequestSong;
     }
 
-    private string _lastPattern = string.Empty;
-
-    private JukeboxStateType RequestSong(out string selectedPattern)
+    private JukeboxStateType RequestSong(out string selectedPattern, out string selectedSong)
     {
-        ConsoleEngine.WriteText("Enter pattern (n=next, q=quit): ");
+        selectedSong = string.Empty;
+
+        ConsoleEngine.WriteText("Enter pattern: ");
         var input = ConsoleEngine.ReadLine();
 
-        if (string.Equals(input, "q", StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(input, ":q", StringComparison.OrdinalIgnoreCase))
         {
             selectedPattern = string.Empty;
             return JukeboxStateType.Exit;
         }
 
-        if (string.Equals(input, "n", StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(input, ":?", StringComparison.Ordinal))
         {
+            ShowHelp();
+            selectedPattern = string.Empty;
+            return JukeboxStateType.RequestSong;
+        }
+
+        if (string.Equals(input, ":l", StringComparison.OrdinalIgnoreCase))
+        {
+            ListFavourites();
+            selectedPattern = string.Empty;
+            return JukeboxStateType.RequestSong;
+        }
+
+        if (string.Equals(input, ":f", StringComparison.OrdinalIgnoreCase))
+        {
+            _inFavouritesMode = true;
+            selectedPattern = string.Empty;
+            return PlayRandomFavourite(out selectedSong);
+        }
+
+        if (string.Equals(input, ":n", StringComparison.OrdinalIgnoreCase))
+        {
+            if (_inFavouritesMode)
+            {
+                selectedPattern = string.Empty;
+                return PlayRandomFavourite(out selectedSong);
+            }
+
             if (_lastPattern.Length > 0)
             {
                 selectedPattern = _lastPattern;
@@ -137,6 +171,7 @@ public class JukeboxEngine : IJukeboxEngine
 
         if (!string.IsNullOrWhiteSpace(input))
         {
+            _inFavouritesMode = false;
             _lastPattern = input;
             selectedPattern = input;
             return JukeboxStateType.FindSong;
@@ -146,11 +181,61 @@ public class JukeboxEngine : IJukeboxEngine
         return JukeboxStateType.RequestSong;
     }
 
+    private JukeboxStateType PlayRandomFavourite(out string selectedSong)
+    {
+        var favourite = Favourites.GetRandomFavourite();
+
+        if (favourite == null)
+        {
+            DisplayEngine.WriteError("No favourites yet");
+            _inFavouritesMode = false;
+            selectedSong = string.Empty;
+            return JukeboxStateType.RequestSong;
+        }
+
+        var fileName = Path.GetFileName(favourite.FullPath);
+        ConsoleEngine.WriteALine();
+        ConsoleEngine.WriteText("Playing: ");
+        DisplayEngine.WriteYellowText(fileName);
+        selectedSong = favourite.FullPath;
+        return JukeboxStateType.PlaySong;
+    }
+
+    private void ListFavourites()
+    {
+        var favourites = Favourites.GetTopFavourites();
+
+        if (favourites.Count == 0)
+        {
+            DisplayEngine.WriteError("No favourites yet");
+            return;
+        }
+
+        foreach (var entry in favourites)
+        {
+            var fileName = Path.GetFileName(entry.FullPath);
+            DisplayEngine.WriteYellowText($"  {entry.PlayCount}x  {fileName}");
+        }
+    }
+
     private JukeboxStateType ShowTitleBox()
     {
         DisplayEngine.FlowerBox();
         SongSources.DisplaySongCounts();
+        ShowHelp();
 
         return JukeboxStateType.RequestSong;
+    }
+
+    private void ShowHelp()
+    {
+        ConsoleEngine.WriteALine();
+        ConsoleEngine.WriteALine("Commands:");
+        ConsoleEngine.WriteALine("  :n  - Next (repeat last search or next favourite)");
+        ConsoleEngine.WriteALine("  :f  - Play a random favourite");
+        ConsoleEngine.WriteALine("  :l  - List favourites");
+        ConsoleEngine.WriteALine("  :?  - Show this help");
+        ConsoleEngine.WriteALine("  :q  - Quit");
+        ConsoleEngine.WriteALine();
     }
 }

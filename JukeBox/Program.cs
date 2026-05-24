@@ -18,10 +18,13 @@ internal static class Program
 
         var songSourcePaths = configuration.GetSection("SongSources").Get<List<string>>() ?? [];
 
+        var favouritesPath = Path.Combine(AppContext.BaseDirectory, "favourites.json");
+
         using var serviceProvider = new ServiceCollection()
             .AddSingleton<IConsoleEngine, ConsoleEngine>()
             .AddSingleton<IDisplay, Display>()
             .AddSingleton<IFileSystemParser, FileSystemParser>()
+            .AddSingleton<IFavourites>(new Favourites(favouritesPath))
             .AddSingleton<IJukeboxEngine, JukeboxEngine>()
             .AddSingleton<ISongSources>(sp => new SongSources(sp.GetRequiredService<IDisplay>(), songSourcePaths))
             .AddSingleton<ISongList, SongList>()
