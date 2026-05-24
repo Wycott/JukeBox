@@ -1,6 +1,6 @@
 ﻿namespace JukeboxInterfaces;
 
-public interface ISongPlayer
+public interface ISongPlayer : IDisposable
 {
     void PlaySong(string filename);
 }

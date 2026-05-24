@@ -48,7 +48,7 @@ public class FileSystemParser : IFileSystemParser
             }
         }
 
-        return haveArtist ? retVal.OrderBy(_ => Guid.NewGuid()).ToList() : retVal;
+        return haveArtist ? retVal.OrderBy(_ => Random.Shared.Next()).ToList() : retVal;
     }
 
     private static readonly string[] ValidExtensions = [".mp3", ".m4a"];
@@ -81,8 +81,8 @@ public class FileSystemParser : IFileSystemParser
 
     private static bool HaveASongByThisArtist(string songPattern, string artist)
     {
-        var nonSongSection = songPattern[..songPattern.LastIndexOf("\\", StringComparison.Ordinal)];
+        var directory = Path.GetDirectoryName(songPattern) ?? string.Empty;
 
-        return nonSongSection.Contains(artist, StringComparison.OrdinalIgnoreCase);
+        return directory.Contains(artist, StringComparison.OrdinalIgnoreCase);
     }
 }

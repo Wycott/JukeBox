@@ -42,9 +42,18 @@ public class SongSources : ISongSources
                 catch (UnauthorizedAccessException)
                 {
                 }
+                catch (IOException)
+                {
+                }
             }
         }
         catch (DirectoryNotFoundException)
+        {
+        }
+        catch (UnauthorizedAccessException)
+        {
+        }
+        catch (IOException)
         {
         }
 

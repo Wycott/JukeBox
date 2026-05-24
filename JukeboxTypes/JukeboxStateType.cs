@@ -2,7 +2,7 @@
 
 public enum JukeboxStateType
 {
-    Unknown,
+    Exit,
     ShowTitleBox,
     RequestSong,
     FindSong,

@@ -47,7 +47,12 @@ public class Display : IDisplay
         var consoleInput = ConsoleEngine.ReadAKey();
         ConsoleEngine.WriteALine();
 
-        return consoleInput.Key switch
+        return InterpretYesNo(consoleInput.Key);
+    }
+
+    private static bool? InterpretYesNo(ConsoleKey key)
+    {
+        return key switch
         {
             ConsoleKey.Y => true,
             ConsoleKey.N => false,

@@ -2,7 +2,7 @@
 
 public interface ISong
 {
-    string FullPath { get; set; }
-    string ShortenedPath { get; set; }
+    string FullPath { get; }
+    string ShortenedPath { get; }
     string FileName { get; }
 }

@@ -70,3 +70,95 @@
 
 - [x] **Collection initialisers use `new()` target-typed syntax inconsistently**
   Some places use `new List<string>()` and others use `new()`. Pick one style for consistency across the codebase.
+
+---
+
+## Second Pass
+
+### High Priority
+
+- [x] **`ServiceProvider` is never disposed in `Program.cs`**
+  The `ServiceProvider` is built but never disposed. Since `SongPlayer` now implements `IDisposable`, the DI container should dispose it on shutdown. Wrap the provider in a `using` statement or call `serviceProvider.Dispose()` after `engine.Start()` returns.
+
+- [x] **`HaveASongByThisArtist` uses hardcoded `\\` path separator**
+  `FileSystemParser.HaveASongByThisArtist()` calls `LastIndexOf("\\")` which won't work on non-Windows platforms. Use `Path.GetDirectoryName()` or `Path.DirectorySeparatorChar` instead.
+
+- [x] **`SongSources.CountSongsInSource` only catches `DirectoryNotFoundException` at the top level**
+  If a source path exists but is inaccessible (e.g. network drive timeout), `IOException` or `UnauthorizedAccessException` from `GetDirectories` will crash the app at startup. The inner loop catches `UnauthorizedAccessException` but the outer `GetDirectories` call does not.
+
+- [x] **`JukeboxLibrary` has a direct dependency on NAudio but doesn't use it**
+  `JukeboxLibrary.csproj` references the `naudio` package, but `JukeboxEngine` doesn't use NAudio directly — that's in `JukeboxDomain`. This is a redundant dependency that inflates the library project.
+
+### Medium Priority
+
+- [x] **`ISongPlayer` doesn't extend `IDisposable` — disposal depends on knowing the concrete type**
+  `SongPlayer` implements `IDisposable` but the interface `ISongPlayer` doesn't declare it. Consumers working through the interface (including the DI container) won't know to dispose it unless the container tracks it. Add `IDisposable` to the interface contract.
+
+- [x] **`FileSystemParser.ParseFileSystem` uses `Guid.NewGuid()` for shuffle — not truly random**
+  `OrderBy(_ => Guid.NewGuid())` produces a non-uniform shuffle because GUIDs aren't designed for randomness. Use `Random.Shared.Next()` or the .NET 8+ `Random.Shared.Shuffle()` for a proper Fisher-Yates shuffle.
+
+- [x] **`FindSong` can skip the `Build` call if `selectedPattern` is null, then checks stale `SongCollection`**
+  If `selectedPattern` is somehow null, the `Build` call is skipped but `SongCollection.Count` is still checked. This would use results from a previous search, which is confusing. The parameter is typed as `string?` but the caller always passes a non-null value — tighten the type to `string` and remove the null check.
+
+- [x] **`JukeboxLibrary.Test` is missing `<IsTestProject>true</IsTestProject>`**
+  The `JukeboxDomain.Test` csproj has this property but `JukeboxLibrary.Test` does not. This can affect how the project is treated by tooling (e.g. NuGet pack, code coverage).
+
+- [x] **`SongListTest` has an unused `using JukeboxDomain.Helpers`**
+  Minor, but the import is no longer needed since `FileSystemParser` is now injected via interface.
+
+### Low Priority
+
+- [x] **`ISong.FullPath` and `ShortenedPath` have public setters on the interface**
+  The interface exposes mutable setters for `FullPath` and `ShortenedPath`. Only `FileSystemParser` sets these during construction. Make them `{ get; }` on the interface and use `init` or constructor parameters on the `Song` class.
+
+- [x] **`MachineState.cs` filename doesn't match its content**
+  The file is named `MachineState.cs` but contains the enum `JukeboxStateType`. Rename the file to `JukeboxStateType.cs` for discoverability.
+
+- [x] **`JukeboxStateType.Unknown` is used as a sentinel for "quit" — semantically misleading**
+  The `Unknown` state now means "exit the application" rather than an actual unknown/error state. Consider renaming it to `Exit` or adding a dedicated `Exit` value to make the intent clear.
+
+- [x] **No `appsettings.json` validation — app crashes with unhelpful error if file is malformed**
+  If `appsettings.json` is missing or contains invalid JSON, the app throws a raw `FileNotFoundException` or `JsonException`. Add a friendlier startup check or make the file optional with a warning.
+
+- [x] **`Display.IsThisTheRightSong` mixes UI prompting with input parsing**
+  The method writes output, reads a key, and interprets the result — three responsibilities. Splitting the prompt from the input interpretation would make it easier to test and reuse.
+
+- [x] **NAudio `2.2.1` is referenced in two projects (`JukeboxDomain` and `JukeboxLibrary`)**
+  Both csproj files reference NAudio but only `JukeboxDomain` actually uses it. If the version drifts between the two, it could cause binding conflicts. Remove the one in `JukeboxLibrary` (noted above) and consider using a `Directory.Packages.props` for central package management.
+
+---
+
+## Final Pass
+
+The codebase is in solid shape after the previous rounds of fixes. The remaining items below are minor polish and architectural considerations rather than bugs or correctness issues.
+
+### Medium Priority
+
+- [ ] **`SongPlayer` tests don't dispose the player — potential test resource leaks**
+  `SongPlayerTest` creates `SongPlayer` instances (which implement `IDisposable`) but never wraps them in `using` statements. While unlikely to cause issues in a test runner, it's inconsistent with the disposal pattern we've established.
+
+- [ ] **`ConsoleEngineTest` mutates global `Console.SetOut`/`Console.SetIn` without restoring**
+  Tests redirect `Console.Out` and `Console.In` but never restore the originals. If tests run in parallel or a later test depends on standard console streams, this could cause flaky failures. Capture and restore the original streams in a `try/finally` or use `IDisposable` test fixtures.
+
+- [ ] **`FileSystemParser.ParseFileSystem` only catches `DirectoryNotFoundException` from `GetDirectories`**
+  Similar to the fix applied in `SongSources`, the outer `GetDirectories` call in `ParseFileSystem` should also catch `UnauthorizedAccessException` and `IOException` for resilience against network drives or permission issues.
+
+- [ ] **`IFileSystemParser.ParseFileSystem` returns `List<ISong>` — should return `IReadOnlyList<ISong>`**
+  The interface returns a mutable `List<ISong>` which is inconsistent with the `IReadOnlyList` pattern used elsewhere (`ISongList.SongCollection`, `ISongSources.Sources`). Return `IReadOnlyList<ISong>` for consistency.
+
+### Low Priority
+
+- [ ] **`JukeboxEngine` tests rely on `OperationCanceledException` to break the loop — fragile pattern**
+  Every engine test throws `OperationCanceledException` from a mock to exit the `while` loop. Now that the engine supports a proper `Exit` state via "q", tests could use `consoleMock.Setup(x => x.ReadLine()).Returns("q")` for a cleaner exit on the second call instead of throwing.
+
+- [ ] **No `Usings.cs` file in `JukeboxDomain.Test` for global usings**
+  `JukeboxLibrary.Test` has a `<Using Include="Xunit" />` in its csproj and a `Usings.cs` file, but `JukeboxDomain.Test` has neither. Adding a global `using Xunit;` would remove the need for implicit `[Fact]` resolution and keep the projects consistent.
+
+- [ ] **`SongSources` constructor performs I/O (directory scanning) — slows DI resolution**
+  The constructor calls `DisplaySongCounts()` which scans the file system. This means DI container resolution triggers potentially slow I/O. Consider making the count display lazy (called on first use or via an explicit `Initialize()` method) so the app starts faster.
+
+- [ ] **`JukeboxEngine` could benefit from a `CancellationToken` for cooperative shutdown**
+  The engine currently relies on the "q" command to exit. If the app needs to be stopped programmatically (e.g. from a signal handler or test), there's no mechanism. Adding a `CancellationToken` parameter to `Start()` would enable graceful external shutdown.
+
+- [ ] **Solution file still references old-style project GUIDs (`FAE04EC0-...`) for test projects**
+  The test projects use the legacy project type GUID (`FAE04EC0-301F-11D3-BF4B-00C04F79EFBC`) while the main projects use the SDK-style GUID (`9A19103F-16F7-4668-BE54-9A1E7A4F7556`). This is cosmetic and doesn't affect builds, but normalizing them would clean up the solution file.

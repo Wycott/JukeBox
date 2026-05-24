@@ -13,12 +13,12 @@ internal static class Program
     {
         var configuration = new ConfigurationBuilder()
             .SetBasePath(AppContext.BaseDirectory)
-            .AddJsonFile("appsettings.json", optional: false)
+            .AddJsonFile("appsettings.json", optional: true)
             .Build();
 
         var songSourcePaths = configuration.GetSection("SongSources").Get<List<string>>() ?? [];
 
-        var serviceProvider = new ServiceCollection()
+        using var serviceProvider = new ServiceCollection()
             .AddSingleton<IConsoleEngine, ConsoleEngine>()
             .AddSingleton<IDisplay, Display>()
             .AddSingleton<IFileSystemParser, FileSystemParser>()
@@ -28,8 +28,8 @@ internal static class Program
             .AddSingleton<ISongPlayer, SongPlayer>()
             .BuildServiceProvider();
 
-        var engine = serviceProvider.GetService<IJukeboxEngine>();
+        var engine = serviceProvider.GetRequiredService<IJukeboxEngine>();
 
-        engine?.Start();
+        engine.Start();
     }
 }

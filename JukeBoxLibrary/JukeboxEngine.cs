@@ -32,7 +32,7 @@ public class JukeboxEngine : IJukeboxEngine
 
         var jukeboxState = JukeboxStateType.ShowTitleBox;
 
-        while (jukeboxState != JukeboxStateType.Unknown)
+        while (jukeboxState != JukeboxStateType.Exit)
         {
             switch (jukeboxState)
             {
@@ -96,43 +96,37 @@ public class JukeboxEngine : IJukeboxEngine
         return JukeboxStateType.RequestSong;
     }
 
-    private JukeboxStateType FindSong(string? selectedPattern)
+    private JukeboxStateType FindSong(string selectedPattern)
     {
-        JukeboxStateType jukeboxState;
-
-        if (selectedPattern != null)
-        {
-            SongList.Build(SongSources, selectedPattern);
-        }
+        SongList.Build(SongSources, selectedPattern);
 
         if (SongList.SongCollection.Count > 0)
         {
-            jukeboxState = JukeboxStateType.SelectVersion;
-        }
-        else
-        {
-            DisplayEngine.WriteError("Not Found!");
-            jukeboxState = JukeboxStateType.RequestSong;
+            return JukeboxStateType.SelectVersion;
         }
 
-        return jukeboxState;
+        DisplayEngine.WriteError("Not Found!");
+        return JukeboxStateType.RequestSong;
     }
 
-    private JukeboxStateType RequestSong(out string? selectedPattern)
+    private JukeboxStateType RequestSong(out string selectedPattern)
     {
         ConsoleEngine.WriteText("Enter pattern (q to quit): ");
-        selectedPattern = ConsoleEngine.ReadLine();
+        var input = ConsoleEngine.ReadLine();
 
-        if (string.Equals(selectedPattern, "q", StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(input, "q", StringComparison.OrdinalIgnoreCase))
         {
-            return JukeboxStateType.Unknown;
+            selectedPattern = string.Empty;
+            return JukeboxStateType.Exit;
         }
 
-        if (!string.IsNullOrWhiteSpace(selectedPattern))
+        if (!string.IsNullOrWhiteSpace(input))
         {
+            selectedPattern = input;
             return JukeboxStateType.FindSong;
         }
 
+        selectedPattern = string.Empty;
         return JukeboxStateType.RequestSong;
     }
 
