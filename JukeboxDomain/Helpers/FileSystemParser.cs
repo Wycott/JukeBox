@@ -54,7 +54,7 @@ public static class FileSystemParser
 
     private static bool ExtensionsOk(string candidate)
     {
-        var extensions = new List<string> { ".mp3" };
+        var extensions = new List<string> { ".mp3"};
 
         foreach (var s in extensions)
         {
