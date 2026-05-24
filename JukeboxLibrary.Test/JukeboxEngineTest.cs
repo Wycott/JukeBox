@@ -316,3 +316,100 @@ public class JukeboxEngineAdditionalTest
         songListMock.Verify(x => x.Build(It.IsAny<ISongSources>(), It.IsAny<string>()), Times.Never);
     }
 }
+
+public class JukeboxEngineNextPatternTest
+{
+    [Fact]
+    public void Start_WithN_RepeatsLastPattern()
+    {
+        // Arrange
+        var songSourcesMock = new Mock<ISongSources>();
+        var songListMock = new Mock<ISongList>();
+        var songPlayerMock = new Mock<ISongPlayer>();
+        var displayMock = new Mock<IDisplay>();
+        var consoleMock = new Mock<IConsoleEngine>();
+        var songMock = new Mock<ISong>();
+
+        songMock.Setup(x => x.FullPath).Returns("love_song.mp3");
+        songMock.Setup(x => x.ShortenedPath).Returns("love_song");
+        songListMock.Setup(x => x.SongCollection).Returns(new List<ISong> { songMock.Object });
+        displayMock.Setup(x => x.IsThisTheRightSong(It.IsAny<string>())).Returns(true);
+
+        var callCount = 0;
+        consoleMock.Setup(x => x.ReadLine()).Returns(() =>
+        {
+            return callCount++ switch
+            {
+                0 => "love",   // first search
+                1 => "n",      // repeat last pattern
+                _ => "q"
+            };
+        });
+
+        var engine = new JukeboxEngine(songSourcesMock.Object, songListMock.Object,
+            songPlayerMock.Object, displayMock.Object, consoleMock.Object);
+
+        // Act
+        engine.Start();
+
+        // Assert - Build should be called twice with "love"
+        songListMock.Verify(x => x.Build(songSourcesMock.Object, "love"), Times.Exactly(2));
+    }
+
+    [Fact]
+    public void Start_WithN_WhenNoLastPattern_ShowsError()
+    {
+        // Arrange
+        var songSourcesMock = new Mock<ISongSources>();
+        var songListMock = new Mock<ISongList>();
+        var songPlayerMock = new Mock<ISongPlayer>();
+        var displayMock = new Mock<IDisplay>();
+        var consoleMock = new Mock<IConsoleEngine>();
+
+        var callCount = 0;
+        consoleMock.Setup(x => x.ReadLine()).Returns(() => callCount++ == 0 ? "n" : "q");
+
+        var engine = new JukeboxEngine(songSourcesMock.Object, songListMock.Object,
+            songPlayerMock.Object, displayMock.Object, consoleMock.Object);
+
+        // Act
+        engine.Start();
+
+        // Assert
+        displayMock.Verify(x => x.WriteError("No previous pattern"), Times.Once);
+        songListMock.Verify(x => x.Build(It.IsAny<ISongSources>(), It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact]
+    public void Start_WithUppercaseN_RepeatsLastPattern()
+    {
+        // Arrange
+        var songSourcesMock = new Mock<ISongSources>();
+        var songListMock = new Mock<ISongList>();
+        var songPlayerMock = new Mock<ISongPlayer>();
+        var displayMock = new Mock<IDisplay>();
+        var consoleMock = new Mock<IConsoleEngine>();
+
+        songListMock.Setup(x => x.SongCollection).Returns(new List<ISong>());
+
+        var callCount = 0;
+        consoleMock.Setup(x => x.ReadLine()).Returns(() =>
+        {
+            return callCount++ switch
+            {
+                0 => "@stones",
+                1 => "N",       // uppercase N
+                _ => "q"
+            };
+        });
+
+        var engine = new JukeboxEngine(songSourcesMock.Object, songListMock.Object,
+            songPlayerMock.Object, displayMock.Object, consoleMock.Object);
+
+        // Act
+        engine.Start();
+
+        // Assert - Build called twice with the same pattern
+        songListMock.Verify(x => x.Build(songSourcesMock.Object, "@stones"), Times.Exactly(2));
+    }
+}

@@ -109,9 +109,11 @@ public class JukeboxEngine : IJukeboxEngine
         return JukeboxStateType.RequestSong;
     }
 
+    private string _lastPattern = string.Empty;
+
     private JukeboxStateType RequestSong(out string selectedPattern)
     {
-        ConsoleEngine.WriteText("Enter pattern (q to quit): ");
+        ConsoleEngine.WriteText("Enter pattern (n=next, q=quit): ");
         var input = ConsoleEngine.ReadLine();
 
         if (string.Equals(input, "q", StringComparison.OrdinalIgnoreCase))
@@ -120,8 +122,22 @@ public class JukeboxEngine : IJukeboxEngine
             return JukeboxStateType.Exit;
         }
 
+        if (string.Equals(input, "n", StringComparison.OrdinalIgnoreCase))
+        {
+            if (_lastPattern.Length > 0)
+            {
+                selectedPattern = _lastPattern;
+                return JukeboxStateType.FindSong;
+            }
+
+            DisplayEngine.WriteError("No previous pattern");
+            selectedPattern = string.Empty;
+            return JukeboxStateType.RequestSong;
+        }
+
         if (!string.IsNullOrWhiteSpace(input))
         {
+            _lastPattern = input;
             selectedPattern = input;
             return JukeboxStateType.FindSong;
         }
