@@ -2,7 +2,7 @@
 
 namespace JukeboxDomain.Helpers;
 
-public class FileSystemParser : IFileSystemParser
+public class FileSystemParser(IBanList banList) : IFileSystemParser
 {
     public IReadOnlyList<ISong> ParseFileSystem(ISongSources mediaDrives, string huntString)
     {
@@ -39,7 +39,7 @@ public class FileSystemParser : IFileSystemParser
                 {
                     foreach (var possibleSongFile in Directory.GetFiles(possibleSongDirectory, huntString, SearchOption.AllDirectories))
                     {
-                        if (ExtensionsOk(possibleSongFile))
+                        if (ExtensionsOk(possibleSongFile) && !banList.IsBanned(possibleSongFile))
                         {
                             if (!haveArtist || HaveASongByThisArtist(possibleSongFile, artist))
                             {

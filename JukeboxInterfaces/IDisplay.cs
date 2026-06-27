@@ -6,7 +6,7 @@ public interface IDisplay
 
     void WriteYellowText(string data);
 
-    bool? IsThisTheRightSong(string candidate);
+    SongResponse IsThisTheRightSong(string candidate);
 
     void WriteError(string errorMessage);
 }

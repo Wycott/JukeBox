@@ -21,12 +21,14 @@ internal static class Program
         var maxFavourites = configuration.GetValue("Favourites:MaxStored", 100);
         var favouritesPageSize = configuration.GetValue("Favourites:PageSize", 20);
         var favouritesPath = Path.Combine(AppContext.BaseDirectory, "favourites.json");
+        var bannedPath = Path.Combine(AppContext.BaseDirectory, "banned.json");
 
         using var serviceProvider = new ServiceCollection()
             .AddSingleton<IConsoleEngine, ConsoleEngine>()
             .AddSingleton<IDisplay, Display>()
             .AddSingleton<IFileSystemParser, FileSystemParser>()
             .AddSingleton<IFavourites>(new Favourites(favouritesPath, maxFavourites))
+            .AddSingleton<IBanList>(new BanList(bannedPath))
             .AddSingleton<IJukeboxEngine>(sp => new JukeboxEngine(
                 sp.GetRequiredService<ISongSources>(),
                 sp.GetRequiredService<ISongList>(),
@@ -34,6 +36,7 @@ internal static class Program
                 sp.GetRequiredService<IDisplay>(),
                 sp.GetRequiredService<IConsoleEngine>(),
                 sp.GetRequiredService<IFavourites>(),
+                sp.GetRequiredService<IBanList>(),
                 favouritesPageSize))
             .AddSingleton<ISongSources>(sp => new SongSources(sp.GetRequiredService<IDisplay>(), songSourcePaths))
             .AddSingleton<ISongList, SongList>()

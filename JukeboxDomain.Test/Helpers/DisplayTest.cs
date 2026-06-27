@@ -67,7 +67,7 @@ public class DisplayTest
     }
 
     [Fact]
-    public void IsThisTheRightSong_WhenYPressed_ReturnsTrue()
+    public void IsThisTheRightSong_WhenYPressed_ReturnsYes()
     {
         // Arrange
         var consoleEngineMock = new Mock<IConsoleEngine>();
@@ -79,11 +79,11 @@ public class DisplayTest
         var result = displayEngine.IsThisTheRightSong("test song");
 
         // Assert
-        Assert.True(result);
+        Assert.Equal(SongResponse.Yes, result);
     }
 
     [Fact]
-    public void IsThisTheRightSong_WhenNPressed_ReturnsFalse()
+    public void IsThisTheRightSong_WhenNPressed_ReturnsNo()
     {
         // Arrange
         var consoleEngineMock = new Mock<IConsoleEngine>();
@@ -95,11 +95,11 @@ public class DisplayTest
         var result = displayEngine.IsThisTheRightSong("test song");
 
         // Assert
-        Assert.False(result);
+        Assert.Equal(SongResponse.No, result);
     }
 
     [Fact]
-    public void IsThisTheRightSong_WhenOtherKeyPressed_ReturnsNull()
+    public void IsThisTheRightSong_WhenOtherKeyPressed_ReturnsCancel()
     {
         // Arrange
         var consoleEngineMock = new Mock<IConsoleEngine>();
@@ -111,7 +111,7 @@ public class DisplayTest
         var result = displayEngine.IsThisTheRightSong("test song");
 
         // Assert
-        Assert.Null(result);
+        Assert.Equal(SongResponse.Cancel, result);
     }
 
     [Fact]

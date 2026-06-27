@@ -13,7 +13,8 @@ public class JukeboxEngineTest
         Mock<ISongPlayer>? songPlayer = null,
         Mock<IDisplay>? display = null,
         Mock<IConsoleEngine>? console = null,
-        Mock<IFavourites>? favourites = null)
+        Mock<IFavourites>? favourites = null,
+        Mock<IBanList>? banList = null)
     {
         return new JukeboxEngine(
             (songSources ?? new Mock<ISongSources>()).Object,
@@ -21,7 +22,8 @@ public class JukeboxEngineTest
             (songPlayer ?? new Mock<ISongPlayer>()).Object,
             (display ?? new Mock<IDisplay>()).Object,
             (console ?? new Mock<IConsoleEngine>()).Object,
-            (favourites ?? new Mock<IFavourites>()).Object);
+            (favourites ?? new Mock<IFavourites>()).Object,
+            (banList ?? new Mock<IBanList>()).Object);
     }
 
     [Fact]
@@ -54,7 +56,7 @@ public class JukeboxEngineTest
 
         var callCount = 0;
         consoleMock.Setup(x => x.ReadLine()).Returns(() => callCount++ == 0 ? "test" : ":q");
-        displayMock.Setup(x => x.IsThisTheRightSong(It.IsAny<string>())).Returns(true);
+        displayMock.Setup(x => x.IsThisTheRightSong(It.IsAny<string>())).Returns(SongResponse.Yes);
 
         var engine = CreateEngine(songSourcesMock, songListMock, songPlayerMock, displayMock, consoleMock, favouritesMock);
         engine.Start();
@@ -110,7 +112,7 @@ public class JukeboxEngineTest
 
         var callCount = 0;
         consoleMock.Setup(x => x.ReadLine()).Returns(() => callCount++ == 0 ? "test" : ":q");
-        displayMock.Setup(x => x.IsThisTheRightSong(It.IsAny<string>())).Returns((bool?)null);
+        displayMock.Setup(x => x.IsThisTheRightSong(It.IsAny<string>())).Returns(SongResponse.Cancel);
 
         var engine = CreateEngine(songList: songListMock, display: displayMock, console: consoleMock);
         engine.Start();
@@ -138,7 +140,7 @@ public class JukeboxEngineTest
         consoleMock.Setup(x => x.ReadLine()).Returns(() => callCount++ == 0 ? "test" : ":q");
 
         var songCallCount = 0;
-        displayMock.Setup(x => x.IsThisTheRightSong(It.IsAny<string>())).Returns(() => songCallCount++ == 0 ? false : true);
+        displayMock.Setup(x => x.IsThisTheRightSong(It.IsAny<string>())).Returns(() => songCallCount++ == 0 ? SongResponse.No : SongResponse.Yes);
 
         var engine = CreateEngine(songPlayer: songPlayerMock, songList: songListMock, display: displayMock, console: consoleMock);
         engine.Start();
@@ -219,7 +221,7 @@ public class JukeboxEngineTest
 
         var callCount = 0;
         consoleMock.Setup(x => x.ReadLine()).Returns(() => callCount++ == 0 ? "test" : ":q");
-        displayMock.Setup(x => x.IsThisTheRightSong(It.IsAny<string>())).Returns(false);
+        displayMock.Setup(x => x.IsThisTheRightSong(It.IsAny<string>())).Returns(SongResponse.No);
 
         var engine = CreateEngine(songList: songListMock, display: displayMock, console: consoleMock);
         engine.Start();
@@ -251,7 +253,8 @@ public class JukeboxEngineNextPatternTest
         Mock<ISongPlayer>? songPlayer = null,
         Mock<IDisplay>? display = null,
         Mock<IConsoleEngine>? console = null,
-        Mock<IFavourites>? favourites = null)
+        Mock<IFavourites>? favourites = null,
+        Mock<IBanList>? banList = null)
     {
         return new JukeboxEngine(
             (songSources ?? new Mock<ISongSources>()).Object,
@@ -259,7 +262,8 @@ public class JukeboxEngineNextPatternTest
             (songPlayer ?? new Mock<ISongPlayer>()).Object,
             (display ?? new Mock<IDisplay>()).Object,
             (console ?? new Mock<IConsoleEngine>()).Object,
-            (favourites ?? new Mock<IFavourites>()).Object);
+            (favourites ?? new Mock<IFavourites>()).Object,
+            (banList ?? new Mock<IBanList>()).Object);
     }
 
     [Fact]
@@ -275,7 +279,7 @@ public class JukeboxEngineNextPatternTest
         songMock.Setup(x => x.FullPath).Returns("love_song.mp3");
         songMock.Setup(x => x.ShortenedPath).Returns("love_song");
         songListMock.Setup(x => x.SongCollection).Returns(new List<ISong> { songMock.Object });
-        displayMock.Setup(x => x.IsThisTheRightSong(It.IsAny<string>())).Returns(true);
+        displayMock.Setup(x => x.IsThisTheRightSong(It.IsAny<string>())).Returns(SongResponse.Yes);
 
         var callCount = 0;
         consoleMock.Setup(x => x.ReadLine()).Returns(() => callCount++ switch
@@ -340,7 +344,8 @@ public class JukeboxEngineFavouritesTest
         Mock<ISongPlayer>? songPlayer = null,
         Mock<IDisplay>? display = null,
         Mock<IConsoleEngine>? console = null,
-        Mock<IFavourites>? favourites = null)
+        Mock<IFavourites>? favourites = null,
+        Mock<IBanList>? banList = null)
     {
         return new JukeboxEngine(
             (songSources ?? new Mock<ISongSources>()).Object,
@@ -348,7 +353,8 @@ public class JukeboxEngineFavouritesTest
             (songPlayer ?? new Mock<ISongPlayer>()).Object,
             (display ?? new Mock<IDisplay>()).Object,
             (console ?? new Mock<IConsoleEngine>()).Object,
-            (favourites ?? new Mock<IFavourites>()).Object);
+            (favourites ?? new Mock<IFavourites>()).Object,
+            (banList ?? new Mock<IBanList>()).Object);
     }
 
     [Fact]

@@ -34,25 +34,26 @@ public class Display(IConsoleEngine consoleEngine) : IDisplay
         WriteColourText(data, ConsoleColor.DarkYellow);
     }
 
-    public bool? IsThisTheRightSong(string candidate)
+    public SongResponse IsThisTheRightSong(string candidate)
     {
         Write("Found: ");
         WriteYellowText(candidate);
-        Write("Play y/n? ");
+        Write("Play y/n/b? ");
         
         var consoleInput = ConsoleEngine.ReadAKey();
         ConsoleEngine.WriteALine();
 
-        return InterpretYesNo(consoleInput.Key);
+        return InterpretResponse(consoleInput.Key);
     }
 
-    private static bool? InterpretYesNo(ConsoleKey key)
+    private static SongResponse InterpretResponse(ConsoleKey key)
     {
         return key switch
         {
-            ConsoleKey.Y => true,
-            ConsoleKey.N => false,
-            _ => null
+            ConsoleKey.Y => SongResponse.Yes,
+            ConsoleKey.N => SongResponse.No,
+            ConsoleKey.B => SongResponse.Ban,
+            _ => SongResponse.Cancel
         };
     }
 

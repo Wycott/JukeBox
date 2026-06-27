@@ -33,7 +33,7 @@ public class FileSystemParserTest : IDisposable
         File.WriteAllText(Path.Combine(artistDir, "test_song.mp3"), "");
         File.WriteAllText(Path.Combine(artistDir, "other.txt"), "");
 
-        var parser = new FileSystemParser();
+        var parser = new FileSystemParser(new Mock<IBanList>().Object);
         var songSourcesMock = new Mock<ISongSources>();
         songSourcesMock.Setup(x => x.Sources).Returns(new List<string> { testRoot + Path.DirectorySeparatorChar });
 
@@ -53,7 +53,7 @@ public class FileSystemParserTest : IDisposable
         Directory.CreateDirectory(artistDir);
         File.WriteAllText(Path.Combine(artistDir, "track.m4a"), "");
 
-        var parser = new FileSystemParser();
+        var parser = new FileSystemParser(new Mock<IBanList>().Object);
         var songSourcesMock = new Mock<ISongSources>();
         songSourcesMock.Setup(x => x.Sources).Returns(new List<string> { testRoot + Path.DirectorySeparatorChar });
 
@@ -76,7 +76,7 @@ public class FileSystemParserTest : IDisposable
         File.WriteAllText(Path.Combine(matchDir, "livin.mp3"), "");
         File.WriteAllText(Path.Combine(otherDir, "enter.mp3"), "");
 
-        var parser = new FileSystemParser();
+        var parser = new FileSystemParser(new Mock<IBanList>().Object);
         var songSourcesMock = new Mock<ISongSources>();
         songSourcesMock.Setup(x => x.Sources).Returns(new List<string> { testRoot + Path.DirectorySeparatorChar });
 
@@ -96,7 +96,7 @@ public class FileSystemParserTest : IDisposable
         Directory.CreateDirectory(artistDir);
         File.WriteAllText(Path.Combine(artistDir, "song.mp3"), "");
 
-        var parser = new FileSystemParser();
+        var parser = new FileSystemParser(new Mock<IBanList>().Object);
         var songSourcesMock = new Mock<ISongSources>();
         songSourcesMock.Setup(x => x.Sources).Returns(new List<string> { testRoot + Path.DirectorySeparatorChar });
 
@@ -111,7 +111,7 @@ public class FileSystemParserTest : IDisposable
     public void ParseFileSystem_WithInvalidDirectory_ReturnsEmpty()
     {
         // Arrange
-        var parser = new FileSystemParser();
+        var parser = new FileSystemParser(new Mock<IBanList>().Object);
         var songSourcesMock = new Mock<ISongSources>();
         songSourcesMock.Setup(x => x.Sources).Returns(new List<string> { "Z:\\" });
 
@@ -127,7 +127,7 @@ public class FileSystemParserTest : IDisposable
     public void ParseFileSystem_WithEmptySources_ReturnsEmpty()
     {
         // Arrange
-        var parser = new FileSystemParser();
+        var parser = new FileSystemParser(new Mock<IBanList>().Object);
         var songSourcesMock = new Mock<ISongSources>();
         songSourcesMock.Setup(x => x.Sources).Returns(new List<string>());
 
@@ -146,7 +146,7 @@ public class FileSystemParserTest : IDisposable
         Directory.CreateDirectory(artistDir);
         File.WriteAllText(Path.Combine(artistDir, "song.mp3"), "");
 
-        var parser = new FileSystemParser();
+        var parser = new FileSystemParser(new Mock<IBanList>().Object);
         var sourceWithSeparator = testRoot + Path.DirectorySeparatorChar;
         var songSourcesMock = new Mock<ISongSources>();
         songSourcesMock.Setup(x => x.Sources).Returns(new List<string> { sourceWithSeparator });
@@ -169,7 +169,7 @@ public class FileSystemParserTest : IDisposable
         File.WriteAllText(Path.Combine(artistDir, "cover.jpg"), "");
         File.WriteAllText(Path.Combine(artistDir, "song.wav"), "");
 
-        var parser = new FileSystemParser();
+        var parser = new FileSystemParser(new Mock<IBanList>().Object);
         var songSourcesMock = new Mock<ISongSources>();
         songSourcesMock.Setup(x => x.Sources).Returns(new List<string> { testRoot + Path.DirectorySeparatorChar });
 
