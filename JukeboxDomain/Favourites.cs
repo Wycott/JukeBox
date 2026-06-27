@@ -36,6 +36,14 @@ public class Favourites : IFavourites
         Save();
     }
 
+    public void Remove(string fullPath)
+    {
+        if (playCounts.Remove(fullPath))
+        {
+            Save();
+        }
+    }
+
     public IReadOnlyList<FavouriteEntry> GetTopFavourites()
     {
         return playCounts

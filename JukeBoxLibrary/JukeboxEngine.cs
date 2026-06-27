@@ -21,6 +21,7 @@ public class JukeboxEngine(
     private IFavourites Favourites { get; } = favourites;
 
     private string lastPattern = string.Empty;
+    private string lastPlayedSong = string.Empty;
     private bool inFavouritesMode;
 
     public void Start(CancellationToken cancellationToken = default)
@@ -64,6 +65,7 @@ public class JukeboxEngine(
     {
         SongPlayer.PlaySong(selectedSong);
         Favourites.RecordPlay(selectedSong);
+        lastPlayedSong = selectedSong;
 
         return JukeboxStateType.RequestSong;
     }
@@ -147,6 +149,13 @@ public class JukeboxEngine(
             return PlayRandomFavourite(out selectedSong);
         }
 
+        if (string.Equals(input, ":r", StringComparison.OrdinalIgnoreCase))
+        {
+            RemoveCurrentFromFavourites();
+            selectedPattern = string.Empty;
+            return JukeboxStateType.RequestSong;
+        }
+
         if (string.Equals(input, ":n", StringComparison.OrdinalIgnoreCase))
         {
             if (inFavouritesMode)
@@ -208,6 +217,9 @@ public class JukeboxEngine(
             return;
         }
 
+        ConsoleEngine.WriteALine($"{favourites.Count} favourites:");
+        ConsoleEngine.WriteALine();
+
         var displayed = 0;
 
         foreach (var entry in favourites)
@@ -230,6 +242,19 @@ public class JukeboxEngine(
         }
     }
 
+    private void RemoveCurrentFromFavourites()
+    {
+        if (string.IsNullOrEmpty(lastPlayedSong))
+        {
+            DisplayEngine.WriteError("No song has been played yet");
+            return;
+        }
+
+        Favourites.Remove(lastPlayedSong);
+        var fileName = Path.GetFileName(lastPlayedSong);
+        DisplayEngine.WriteYellowText($"Removed: {fileName}");
+    }
+
     private JukeboxStateType ShowTitleBox()
     {
         DisplayEngine.FlowerBox();
@@ -249,6 +274,7 @@ public class JukeboxEngine(
         ConsoleEngine.WriteALine("Commands:");
         ConsoleEngine.WriteALine("  :n  - Next (repeat last search or next favourite)");
         ConsoleEngine.WriteALine("  :f  - Play a random favourite");
+        ConsoleEngine.WriteALine("  :r  - Remove current song from favourites");
         ConsoleEngine.WriteALine("  :l  - List favourites");
         ConsoleEngine.WriteALine("  :?  - Show this help");
         ConsoleEngine.WriteALine("  :q  - Quit");

@@ -3,6 +3,7 @@ namespace JukeboxInterfaces;
 public interface IFavourites
 {
     void RecordPlay(string fullPath);
+    void Remove(string fullPath);
     IReadOnlyList<FavouriteEntry> GetTopFavourites();
     FavouriteEntry? GetRandomFavourite();
 }
