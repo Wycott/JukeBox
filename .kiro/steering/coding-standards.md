@@ -1,48 +1,16 @@
----
-inclusion: always
----
-
 # Coding Standards
 
-## Language & Framework
+- Use file-scoped namespaces (`namespace Foo;`) instead of block-scoped namespaces.
+- Prefer `var` when the type is obvious from the right-hand side of the assignment.
+- All `if` and `else` statements must use braces, even for single-line bodies.
+- All `return` statements must be preceded by a blank line.
+- Do not use underscore prefix for private member variables. Use `camelCase` without a leading underscore.
+- Never use top-level statements in C# console applications. Always use an explicit `Program` class with a `Main` method.
+- Always create a `.slnx` (solution) file for .NET projects.
+- Unit tests must always be written using xUnit.
+- Business logic must live in a separate class library project, not in the console application project. The console project should only contain the entry point and wiring.
+- Do not create top level folders to put the projects in e.g. src, tests etc. Project folders should be at the top level in the same directory as the .slnx file
+- Always use .NET Core 10
+- When generating code from tasks, do them one at a time. Once one task is finished, start the next.
+- Use the moq framework for mocking.
 
-- C# with .NET 10, implicit usings enabled, nullable reference types enabled
-- Target latest C# language features (collection expressions `[]`, primary constructors, `field` keyword)
-
-## Project Conventions
-
-### Naming
-
-- PascalCase for public members, types, and methods
-- camelCase for private fields (no underscore prefix)
-- Properties preferred over public fields (except `EnglishDictionary.GameLetters` which is a legacy exception)
-
-### Structure
-
-- One class per file (named to match the class)
-- Partial classes are used to separate concerns within a single logical class (e.g. `GameEngine` + `Display`)
-- Static helper classes live in the `Helpers/` folder
-- Interfaces prefixed with `I` (e.g. `IGameConsole`)
-
-### Code Quality
-
-- Mark classes that wrap I/O with `[ExcludeFromCodeCoverage]`
-- Mark AI-generated code with `[AiGenerated]` from the `AiAnnotations` package
-- Keep methods short and focused — prefer extracting helpers
-- Use expression-bodied members where the body is a single expression
-
-### Error Handling
-
-- Prefer guard clauses and early returns
-- Null checks via nullable reference types rather than explicit null guards where possible
-
-### Console Abstraction
-
-- All console interaction goes through `IGameConsole` — never call `System.Console` directly from game logic
-- This enables unit testing without console dependencies
-
-### Persistence
-
-- Use `System.Text.Json` for serialization
-- Keep data files (like `BestGame.json`) in the working directory
-- Use `JsonSerializerOptions { WriteIndented = true }` for human-readable output
