@@ -28,7 +28,8 @@ Generate a `digest.md` file in the repository root with the following sections.
    - `git log --reverse --format=%aI` (first line) for first commit date
    - `git log -1 --format=%aI` for last commit date
    - Calculate the elapsed time between first and last commit
-6. Write `digest.md` using the Output Format below.
+6. If the project has been in development for 2 or more years, gather commits per year using `git log --format=%ai` and count commits grouped by year. Include a Mermaid pie chart in the output showing the number of commits for each year.
+7. Write `digest.md` using the Output Format below.
 
 ### Output Format
 
@@ -71,6 +72,16 @@ Generate a `digest.md` file in the repository root with the following sections.
 | Weeks | 77 |
 | Months | 17 |
 | Years | 1 |
+
+## Commits by Year
+
+```mermaid
+pie title Commits by Year
+    "2021" : 45
+    "2022" : 102
+    "2023" : 87
+    "2024" : 55
+    "2025" : 25
 ```
 
 ### Rules
@@ -82,3 +93,4 @@ Generate a `digest.md` file in the repository root with the following sections.
 - Months is calculated as `floor(days / 30)`.
 - Years is calculated as `floor(days / 365)`.
 - Write the report to `digest.md` in the repository root, overwriting any existing content.
+- Only include the "Commits by Year" Mermaid pie chart section if the project has been in development for 2 or more years (i.e., `floor(days / 365) >= 2`). Each slice label is the year, and the value is the number of commits in that year.

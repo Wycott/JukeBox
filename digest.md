@@ -38,3 +38,14 @@ JukeBox is a console-based music jukebox application that searches local file sy
 | Weeks | 209 |
 | Months | 48 |
 | Years | 4 |
+
+## Commits by Year
+
+```mermaid
+pie title Commits by Year
+    "2022" : 50
+    "2023" : 12
+    "2024" : 12
+    "2025" : 8
+    "2026" : 27
+```
