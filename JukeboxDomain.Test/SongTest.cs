@@ -8,7 +8,7 @@ public class SongTest
     public void FileName_ReturnsFileNameFromFullPath()
     {
         // Arrange
-        var song = new Song { FullPath = @"C:\Music\Artist\Album\Track.mp3" };
+        var song = new Song { FullPath = Path.Combine("C:", "Music", "Artist", "Album", "Track.mp3") };
 
         // Act & Assert
         Assert.Equal("Track.mp3", song.FileName);

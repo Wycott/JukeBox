@@ -21,7 +21,7 @@ public class ConsoleEngineTest
             consoleEngine.WriteALine("Test message");
 
             // Assert
-            Assert.Equal("Test message\r\n", output.ToString());
+            Assert.Equal("Test message" + Environment.NewLine, output.ToString());
         }
         finally
         {
@@ -44,7 +44,7 @@ public class ConsoleEngineTest
             consoleEngine.WriteALine();
 
             // Assert
-            Assert.Equal("\r\n", output.ToString());
+            Assert.Equal(Environment.NewLine, output.ToString());
         }
         finally
         {
