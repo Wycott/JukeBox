@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32602.215
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jukebox", "JukeBox\Jukebox.csproj", "{CB429A8D-7B1E-4F06-B656-72E3EBCE42AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jukebox", "JukeBox\JukeBox.csproj", "{CB429A8D-7B1E-4F06-B656-72E3EBCE42AB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JukeboxLibrary", "JukeBoxLibrary\JukeboxLibrary.csproj", "{2C3688FE-AC41-458E-A9D9-38A466F539E2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JukeboxLibrary", "JukeBoxLibrary\JukeBoxLibrary.csproj", "{2C3688FE-AC41-458E-A9D9-38A466F539E2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JukeboxInterfaces", "JukeboxInterfaces\JukeboxInterfaces.csproj", "{AAB2465F-0F3B-4CC8-AB7B-66461ED66D29}"
 EndProject
