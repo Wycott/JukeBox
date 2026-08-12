@@ -406,8 +406,9 @@ public class JukeboxEngineFavouritesTest
         var consoleMock = new Mock<IConsoleEngine>();
         var favouritesMock = new Mock<IFavourites>();
 
+        var favPath = Path.Combine("C:", "Music", "fav.mp3");
         favouritesMock.Setup(x => x.GetRandomFavourite())
-            .Returns(new FavouriteEntry(@"C:\Music\fav.mp3", 10));
+            .Returns(new FavouriteEntry(favPath, 10));
 
         var callCount = 0;
         consoleMock.Setup(x => x.ReadLine()).Returns(() => callCount++ == 0 ? ":f" : ":q");
@@ -415,7 +416,7 @@ public class JukeboxEngineFavouritesTest
         var engine = CreateEngine(songPlayer: songPlayerMock, display: displayMock, console: consoleMock, favourites: favouritesMock);
         engine.Start();
 
-        songPlayerMock.Verify(x => x.PlaySong(@"C:\Music\fav.mp3"), Times.Once);
+        songPlayerMock.Verify(x => x.PlaySong(favPath), Times.Once);
         displayMock.Verify(x => x.WriteYellowText("fav.mp3"), Times.Once);
         consoleMock.Verify(x => x.WriteText("Playing: "), Times.Once);
     }
@@ -445,8 +446,9 @@ public class JukeboxEngineFavouritesTest
         var consoleMock = new Mock<IConsoleEngine>();
         var favouritesMock = new Mock<IFavourites>();
 
+        var favPath = Path.Combine("C:", "Music", "fav.mp3");
         favouritesMock.Setup(x => x.GetRandomFavourite())
-            .Returns(new FavouriteEntry(@"C:\Music\fav.mp3", 5));
+            .Returns(new FavouriteEntry(favPath, 5));
 
         var callCount = 0;
         consoleMock.Setup(x => x.ReadLine()).Returns(() => callCount++ switch
@@ -459,8 +461,8 @@ public class JukeboxEngineFavouritesTest
         var engine = CreateEngine(songPlayer: songPlayerMock, console: consoleMock, favourites: favouritesMock);
         engine.Start();
 
-        songPlayerMock.Verify(x => x.PlaySong(@"C:\Music\fav.mp3"), Times.Exactly(2));
-        favouritesMock.Verify(x => x.RecordPlay(@"C:\Music\fav.mp3"), Times.Exactly(2));
+        songPlayerMock.Verify(x => x.PlaySong(favPath), Times.Exactly(2));
+        favouritesMock.Verify(x => x.RecordPlay(favPath), Times.Exactly(2));
     }
 
     [Fact]
@@ -472,8 +474,9 @@ public class JukeboxEngineFavouritesTest
         var consoleMock = new Mock<IConsoleEngine>();
         var favouritesMock = new Mock<IFavourites>();
 
+        var favPath = Path.Combine("C:", "Music", "fav.mp3");
         favouritesMock.Setup(x => x.GetRandomFavourite())
-            .Returns(new FavouriteEntry(@"C:\Music\fav.mp3", 5));
+            .Returns(new FavouriteEntry(favPath, 5));
         songListMock.Setup(x => x.SongCollection).Returns(new List<ISong>());
 
         var callCount = 0;
