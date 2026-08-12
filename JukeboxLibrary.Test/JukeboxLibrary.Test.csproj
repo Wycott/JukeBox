@@ -25,7 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\JukeboxInterfaces\JukeboxInterfaces.csproj" />
-    <ProjectReference Include="..\JukeBoxLibrary\JukeboxLibrary.csproj" />
+    <ProjectReference Include="..\JukeBoxLibrary\JukeBoxLibrary.csproj" />
   </ItemGroup>
 
   <ItemGroup>

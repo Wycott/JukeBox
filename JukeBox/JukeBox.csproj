@@ -23,7 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\JukeboxDomain\JukeboxDomain.csproj" />
     <ProjectReference Include="..\JukeboxInterfaces\JukeboxInterfaces.csproj" />
-    <ProjectReference Include="..\JukeBoxLibrary\JukeboxLibrary.csproj" />
+    <ProjectReference Include="..\JukeBoxLibrary\JukeBoxLibrary.csproj" />
   </ItemGroup>
 
 </Project>
