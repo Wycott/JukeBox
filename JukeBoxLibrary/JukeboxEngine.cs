@@ -80,6 +80,7 @@ public class JukeboxEngine(
         foreach (var song in SongList.SongCollection)
         {
             var similarBanned = BanList.IsSimilarToBanned(song.FullPath);
+
             if (similarBanned != null)
             {
                 var skippedName = Path.GetFileName(song.FullPath);
@@ -241,6 +242,7 @@ public class JukeboxEngine(
         }
 
         var similarBanned = BanList.IsSimilarToBanned(favourite.FullPath);
+
         if (similarBanned != null)
         {
             var skippedName = Path.GetFileName(favourite.FullPath);
