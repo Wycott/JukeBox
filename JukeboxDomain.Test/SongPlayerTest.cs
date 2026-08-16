@@ -55,6 +55,7 @@ public class SongPlayerTest
 
         // Act & Assert
         var exception = Record.Exception(() => player.Dispose());
+
         Assert.Null(exception);
     }
 }
