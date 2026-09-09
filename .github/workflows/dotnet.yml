@@ -31,9 +31,20 @@ jobs:
       - name: Build
         run: dotnet build ${{ env.SOLUTION_FILE }} --configuration Release
 
-  test:
+  semgrep:
     runs-on: ubuntu-latest
     needs: build
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Run Semgrep
+        uses: semgrep/semgrep-action@v1
+        with:
+          config: p/csharp            
+
+  test:
+    runs-on: ubuntu-latest
+    needs: semgrep
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-dotnet@v6
