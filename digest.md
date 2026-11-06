@@ -2,7 +2,7 @@
 
 ## Summary
 
-JukeBox is a console-based music jukebox application that searches local file system directories for MP3 and M4A files, presents them to the user for selection, and plays them using NAudio. It supports favourites tracking with play counts, a ban list for excluding songs, and pattern-based or artist-based searching with Levenshtein similarity detection for banned song variants.
+JukeBox is a .NET console jukebox application that scans configured file-system sources for songs, lets the user search, browse, play, favourite, and ban tracks through an interactive console UI. Business logic is organised into separate domain, library, interfaces, and types projects, with the console project providing only the entry point and dependency-injection wiring.
 
 ## Languages
 
@@ -16,9 +16,7 @@ JukeBox is a console-based music jukebox application that searches local file sy
 
 | Language | Count |
 |----------|-------|
-| C# | 24 |
-| JSON | 1 |
-| YAML | 1 |
+| C# | 35 |
 
 ## Unit Tests
 
@@ -31,12 +29,12 @@ JukeBox is a console-based music jukebox application that searches local file sy
 
 | Metric | Value |
 |--------|-------|
-| Total commits | 108 |
+| Total commits | 126 |
 | First commit | Tuesday, 28 June 2022 |
-| Last commit | Thursday, 3 July 2026 |
-| Days | 1466 |
-| Weeks | 209 |
-| Months | 48 |
+| Last commit | Thursday, 5 November 2026 |
+| Days | 1591 |
+| Weeks | 227 |
+| Months | 53 |
 | Years | 4 |
 
 ## Commits by Year
@@ -47,5 +45,5 @@ pie title Commits by Year
     "2023" : 12
     "2024" : 12
     "2025" : 8
-    "2026" : 27
+    "2026" : 44
 ```
