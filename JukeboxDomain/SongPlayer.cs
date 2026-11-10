@@ -5,7 +5,7 @@ using NAudio.Wave;
 namespace JukeboxDomain;
 
 [SupportedOSPlatform("windows")]
-public class SongPlayer(IDisplay displayEngine) : ISongPlayer, IDisposable
+public class SongPlayer(IDisplay displayEngine) : ISongPlayer
 {
     private AudioFileReader? FileReader { get; set; }
     private WaveOut? Player { get; set; }
