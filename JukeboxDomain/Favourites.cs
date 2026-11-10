@@ -5,30 +5,48 @@ namespace JukeboxDomain;
 
 public class Favourites : IFavourites
 {
-    private readonly int maxFavourites;
     private readonly string filePath;
     private readonly Dictionary<string, int> playCounts;
 
     public Favourites(string filePath, int maxFavourites = 100)
     {
         this.filePath = filePath;
-        this.maxFavourites = maxFavourites;
+        MaxFavourites = maxFavourites;
         playCounts = JsonFile.Load<Dictionary<string, int>>(filePath);
     }
 
+    public int Count => playCounts.Count;
+
+    // A soft limit: going over it is allowed, and the user trims with :t when they choose.
+    public int MaxFavourites { get; }
+
     public void RecordPlay(string fullPath)
     {
-        if (playCounts.ContainsKey(fullPath))
+        playCounts[fullPath] = playCounts.GetValueOrDefault(fullPath) + 1;
+        Save();
+    }
+
+    public IReadOnlyList<FavouriteEntry> TrimLeastPlayed()
+    {
+        if (playCounts.Count == 0)
         {
-            playCounts[fullPath]++;
-        }
-        else
-        {
-            playCounts[fullPath] = 1;
+            return [];
         }
 
-        Trim(keep: fullPath);
+        var lowestCount = playCounts.Values.Min();
+        var removed = playCounts
+            .Where(kvp => kvp.Value == lowestCount)
+            .Select(kvp => new FavouriteEntry(kvp.Key, kvp.Value))
+            .ToList();
+
+        foreach (var entry in removed)
+        {
+            playCounts.Remove(entry.FullPath);
+        }
+
         Save();
+
+        return removed;
     }
 
     public void Remove(string fullPath)
@@ -59,24 +77,6 @@ public class Favourites : IFavourites
         var key = entries[index];
 
         return new FavouriteEntry(key, playCounts[key]);
-    }
-
-    private void Trim(string keep)
-    {
-        // Evict the least-played entries, but never the song that was just played -
-        // otherwise a new song (count 1) is always the one evicted and a full list can never change.
-        while (playCounts.Count > maxFavourites)
-        {
-            var candidates = playCounts.Where(kvp => kvp.Key != keep).ToList();
-
-            if (candidates.Count == 0)
-            {
-                break;
-            }
-
-            var victim = candidates.MinBy(kvp => kvp.Value).Key;
-            playCounts.Remove(victim);
-        }
     }
 
     private void Save()

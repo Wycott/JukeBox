@@ -75,9 +75,23 @@ public class JukeboxEngine(
             return JukeboxStateType.RequestSong;
         }
 
+        var countBefore = Favourites.Count;
         Favourites.RecordPlay(selectedSong);
+        WarnIfNewSongTookFavouritesOverLimit(countBefore);
 
         return JukeboxStateType.RequestSong;
+    }
+
+    private void WarnIfNewSongTookFavouritesOverLimit(int countBefore)
+    {
+        // Only a new song grows the list; replaying a favourite doesn't need a warning.
+        var addedNewSong = Favourites.Count > countBefore;
+
+        if (addedNewSong && Favourites.Count > Favourites.MaxFavourites)
+        {
+            DisplayEngine.WriteError(
+                $"Favourites is over its limit ({Favourites.Count} of {Favourites.MaxFavourites}) - use :t to trim");
+        }
     }
 
     private void RemoveMissingFavourite(string selectedSong)
@@ -180,6 +194,9 @@ public class JukeboxEngine(
                 return PlayRandomFavourite(out selectedSong);
             case ":r":
                 RemoveCurrentFromFavourites();
+                return JukeboxStateType.RequestSong;
+            case ":t":
+                TrimLeastPlayedFavourites();
                 return JukeboxStateType.RequestSong;
             case ":b":
                 BanCurrentSong();
@@ -309,6 +326,23 @@ public class JukeboxEngine(
         DisplayEngine.WriteYellowText($"Removed: {fileName}");
     }
 
+    private void TrimLeastPlayedFavourites()
+    {
+        var removed = Favourites.TrimLeastPlayed();
+
+        if (removed.Count == 0)
+        {
+            DisplayEngine.WriteError("No favourites yet");
+            return;
+        }
+
+        var playCount = removed[0].PlayCount;
+        var songs = removed.Count == 1 ? "favourite" : "favourites";
+        var plays = playCount == 1 ? "play" : "plays";
+        DisplayEngine.WriteYellowText(
+            $"Trimmed {removed.Count} {songs} with {playCount} {plays} ({Favourites.Count} left)");
+    }
+
     private void BanCurrentSong()
     {
         if (string.IsNullOrEmpty(lastPlayedSong))
@@ -362,6 +396,7 @@ public class JukeboxEngine(
         ConsoleEngine.WriteALine("  :n  - Next (repeat last search or next favourite)");
         ConsoleEngine.WriteALine("  :f  - Play a random favourite");
         ConsoleEngine.WriteALine("  :r  - Remove current song from favourites");
+        ConsoleEngine.WriteALine("  :t  - Trim favourites (removes those with the fewest plays)");
         ConsoleEngine.WriteALine("  :b  - Ban current song (exclude from future suggestions)");
         ConsoleEngine.WriteALine("  :e  - Show banned (excluded) songs");
         ConsoleEngine.WriteALine("  :l  - List favourites");
