@@ -1,9 +1,11 @@
 using JukeboxDomain;
 using JukeboxInterfaces;
 using Moq;
+using System.Runtime.Versioning;
 
 namespace JukeboxDomain.Test;
 
+[SupportedOSPlatform("windows")]
 public class SongPlayerTest
 {
     [Fact]
@@ -92,6 +94,7 @@ public class SongPlayerTest
     }
 }
 
+[SupportedOSPlatform("windows")]
 public class SongPlayerSequentialTest
 {
     [Fact]

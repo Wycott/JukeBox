@@ -159,87 +159,66 @@ public class JukeboxEngine(
 
     private JukeboxStateType RequestSong(out string selectedPattern, out string selectedSong)
     {
+        selectedPattern = string.Empty;
         selectedSong = string.Empty;
 
         ConsoleEngine.WriteText("Enter pattern or command ");
         var input = ConsoleEngine.ReadLine();
 
-        if (string.Equals(input, ":q", StringComparison.OrdinalIgnoreCase))
+        switch (input?.ToLowerInvariant())
         {
-            selectedPattern = string.Empty;
-            return JukeboxStateType.Exit;
+            case ":q":
+                return JukeboxStateType.Exit;
+            case ":?":
+                ShowHelp();
+                return JukeboxStateType.RequestSong;
+            case ":l":
+                ListFavourites();
+                return JukeboxStateType.RequestSong;
+            case ":f":
+                inFavouritesMode = true;
+                return PlayRandomFavourite(out selectedSong);
+            case ":r":
+                RemoveCurrentFromFavourites();
+                return JukeboxStateType.RequestSong;
+            case ":b":
+                BanCurrentSong();
+                return JukeboxStateType.RequestSong;
+            case ":e":
+                ListBannedSongs();
+                return JukeboxStateType.RequestSong;
+            case ":n":
+                return PlayNext(out selectedPattern, out selectedSong);
         }
 
-        if (string.Equals(input, ":?", StringComparison.Ordinal))
+        if (string.IsNullOrWhiteSpace(input))
         {
-            ShowHelp();
-            selectedPattern = string.Empty;
             return JukeboxStateType.RequestSong;
         }
 
-        if (string.Equals(input, ":l", StringComparison.OrdinalIgnoreCase))
-        {
-            ListFavourites();
-            selectedPattern = string.Empty;
-            return JukeboxStateType.RequestSong;
-        }
+        inFavouritesMode = false;
+        lastPattern = input;
+        selectedPattern = input;
+        return JukeboxStateType.FindSong;
+    }
 
-        if (string.Equals(input, ":f", StringComparison.OrdinalIgnoreCase))
+    private JukeboxStateType PlayNext(out string selectedPattern, out string selectedSong)
+    {
+        selectedPattern = string.Empty;
+        selectedSong = string.Empty;
+
+        if (inFavouritesMode)
         {
-            inFavouritesMode = true;
-            selectedPattern = string.Empty;
             return PlayRandomFavourite(out selectedSong);
         }
 
-        if (string.Equals(input, ":r", StringComparison.OrdinalIgnoreCase))
+        if (lastPattern.Length > 0)
         {
-            RemoveCurrentFromFavourites();
-            selectedPattern = string.Empty;
-            return JukeboxStateType.RequestSong;
-        }
-
-        if (string.Equals(input, ":b", StringComparison.OrdinalIgnoreCase))
-        {
-            BanCurrentSong();
-            selectedPattern = string.Empty;
-            return JukeboxStateType.RequestSong;
-        }
-
-        if (string.Equals(input, ":e", StringComparison.OrdinalIgnoreCase))
-        {
-            ListBannedSongs();
-            selectedPattern = string.Empty;
-            return JukeboxStateType.RequestSong;
-        }
-
-        if (string.Equals(input, ":n", StringComparison.OrdinalIgnoreCase))
-        {
-            if (inFavouritesMode)
-            {
-                selectedPattern = string.Empty;
-                return PlayRandomFavourite(out selectedSong);
-            }
-
-            if (lastPattern.Length > 0)
-            {
-                selectedPattern = lastPattern;
-                return JukeboxStateType.FindSong;
-            }
-
-            DisplayEngine.WriteError("No previous pattern");
-            selectedPattern = string.Empty;
-            return JukeboxStateType.RequestSong;
-        }
-
-        if (!string.IsNullOrWhiteSpace(input))
-        {
-            inFavouritesMode = false;
-            lastPattern = input;
-            selectedPattern = input;
+            selectedPattern = lastPattern;
             return JukeboxStateType.FindSong;
         }
 
-        selectedPattern = string.Empty;
+        DisplayEngine.WriteError("No previous pattern");
         return JukeboxStateType.RequestSong;
     }
 

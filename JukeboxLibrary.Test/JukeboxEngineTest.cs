@@ -643,4 +643,38 @@ public class JukeboxEngineFavouritesTest
 
         songListMock.Verify(x => x.Build(songSourcesMock.Object, "l"), Times.Once);
     }
+
+    [Fact]
+    public void Start_WithQuestionMark_ShowsHelpAgain()
+    {
+        var consoleMock = new Mock<IConsoleEngine>();
+
+        var callCount = 0;
+        consoleMock.Setup(x => x.ReadLine()).Returns(() => callCount++ == 0 ? ":?" : ":q");
+
+        var engine = CreateEngine(console: consoleMock);
+        engine.Start();
+
+        // Once at start-up, once for :?
+        consoleMock.Verify(x => x.WriteALine("Commands:"), Times.Exactly(2));
+    }
+
+    [Theory]
+    [InlineData(":e")]
+    [InlineData(":E")]
+    public void Start_WithE_WhenNothingBanned_ShowsError(string command)
+    {
+        var displayMock = new Mock<IDisplay>();
+        var consoleMock = new Mock<IConsoleEngine>();
+        var banListMock = new Mock<IBanList>();
+        banListMock.Setup(x => x.GetBannedSongs()).Returns([]);
+
+        var callCount = 0;
+        consoleMock.Setup(x => x.ReadLine()).Returns(() => callCount++ == 0 ? command : ":q");
+
+        var engine = CreateEngine(display: displayMock, console: consoleMock, banList: banListMock);
+        engine.Start();
+
+        displayMock.Verify(x => x.WriteError("No banned songs"), Times.Once);
+    }
 }
