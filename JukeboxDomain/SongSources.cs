@@ -21,6 +21,7 @@ public class SongSources(IDisplay display, List<string> sources) : ISongSources
         foreach (var source in Sources)
         {
             var count = CountSongsInSource(source);
+
             display.WriteYellowText($"{source}: {count} songs");
         }
     }

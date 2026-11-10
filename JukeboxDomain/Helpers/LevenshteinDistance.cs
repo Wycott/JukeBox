@@ -20,10 +20,14 @@ public static class LevenshteinDistance
         var matrix = new int[sourceLength + 1, targetLength + 1];
 
         for (var i = 0; i <= sourceLength; i++)
+        {
             matrix[i, 0] = i;
+        }
 
         for (var j = 0; j <= targetLength; j++)
+        {
             matrix[0, j] = j;
+        }
 
         for (var i = 1; i <= sourceLength; i++)
         {
@@ -51,6 +55,7 @@ public static class LevenshteinDistance
         }
 
         var similarity = 1.0 - (double)distance / maxLength;
+
         return similarity >= (1.0 - threshold);
     }
 }
