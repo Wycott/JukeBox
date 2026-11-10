@@ -32,7 +32,7 @@ public class Favourites : IFavourites
             playCounts[fullPath] = 1;
         }
 
-        Trim();
+        Trim(keep: fullPath);
         Save();
     }
 
@@ -66,17 +66,22 @@ public class Favourites : IFavourites
         return new FavouriteEntry(key, playCounts[key]);
     }
 
-    private void Trim()
+    private void Trim(string keep)
     {
-        if (playCounts.Count <= maxFavourites)
+        // Evict the least-played entries, but never the song that was just played -
+        // otherwise a new song (count 1) is always the one evicted and a full list can never change.
+        while (playCounts.Count > maxFavourites)
         {
-            return;
-        }
+            var candidates = playCounts.Where(kvp => kvp.Key != keep).ToList();
 
-        playCounts = playCounts
-            .OrderByDescending(kvp => kvp.Value)
-            .Take(maxFavourites)
-            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            if (candidates.Count == 0)
+            {
+                break;
+            }
+
+            var victim = candidates.MinBy(kvp => kvp.Value).Key;
+            playCounts.Remove(victim);
+        }
     }
 
     private void Save()

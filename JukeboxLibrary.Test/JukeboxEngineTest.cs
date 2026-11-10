@@ -1,8 +1,24 @@
-using AiAnnotations;
+﻿using AiAnnotations;
 using JukeboxInterfaces;
 using Moq;
 
 namespace JukeboxLibrary.Test;
+
+internal static class SongPlayerMocks
+{
+    // Engine tests assume playback succeeds unless a test configures the mock itself.
+    public static Mock<ISongPlayer> WithSuccessfulPlayback(Mock<ISongPlayer>? songPlayer)
+    {
+        var mock = songPlayer ?? new Mock<ISongPlayer>();
+
+        if (!mock.Setups.Any())
+        {
+            mock.Setup(x => x.PlaySong(It.IsAny<string>())).Returns(true);
+        }
+
+        return mock;
+    }
+}
 
 [AiGenerated]
 public class JukeboxEngineTest
@@ -19,7 +35,7 @@ public class JukeboxEngineTest
         return new JukeboxEngine(
             (songSources ?? new Mock<ISongSources>()).Object,
             (songList ?? new Mock<ISongList>()).Object,
-            (songPlayer ?? new Mock<ISongPlayer>()).Object,
+            SongPlayerMocks.WithSuccessfulPlayback(songPlayer).Object,
             (display ?? new Mock<IDisplay>()).Object,
             (console ?? new Mock<IConsoleEngine>()).Object,
             (favourites ?? new Mock<IFavourites>()).Object,
@@ -64,6 +80,39 @@ public class JukeboxEngineTest
         songListMock.Verify(x => x.Build(songSourcesMock.Object, "test"), Times.Once);
         songPlayerMock.Verify(x => x.PlaySong("test.mp3"), Times.Once);
         favouritesMock.Verify(x => x.RecordPlay("test.mp3"), Times.Once);
+    }
+
+    [Fact]
+    public void Start_WhenPlaybackFails_DoesNotRecordFavouriteOrSetCurrentSong()
+    {
+        var songListMock = new Mock<ISongList>();
+        var songPlayerMock = new Mock<ISongPlayer>();
+        var displayMock = new Mock<IDisplay>();
+        var consoleMock = new Mock<IConsoleEngine>();
+        var favouritesMock = new Mock<IFavourites>();
+        var songMock = new Mock<ISong>();
+
+        songMock.Setup(x => x.FullPath).Returns("broken.mp3");
+        songMock.Setup(x => x.ShortenedPath).Returns("broken");
+        songListMock.Setup(x => x.SongCollection).Returns(new List<ISong> { songMock.Object });
+        songPlayerMock.Setup(x => x.PlaySong(It.IsAny<string>())).Returns(false);
+
+        var callCount = 0;
+        consoleMock.Setup(x => x.ReadLine()).Returns(() => callCount++ switch
+        {
+            0 => "broken",
+            1 => ":r",
+            _ => ":q"
+        });
+        displayMock.Setup(x => x.IsThisTheRightSong(It.IsAny<string>())).Returns(SongResponse.Yes);
+
+        var engine = CreateEngine(songList: songListMock, songPlayer: songPlayerMock, display: displayMock, console: consoleMock, favourites: favouritesMock);
+        engine.Start();
+
+        songPlayerMock.Verify(x => x.PlaySong("broken.mp3"), Times.Once);
+        favouritesMock.Verify(x => x.RecordPlay(It.IsAny<string>()), Times.Never);
+        favouritesMock.Verify(x => x.Remove(It.IsAny<string>()), Times.Never);
+        displayMock.Verify(x => x.WriteError("No song has been played yet"), Times.Once);
     }
 
     [Fact]
@@ -259,7 +308,7 @@ public class JukeboxEngineNextPatternTest
         return new JukeboxEngine(
             (songSources ?? new Mock<ISongSources>()).Object,
             (songList ?? new Mock<ISongList>()).Object,
-            (songPlayer ?? new Mock<ISongPlayer>()).Object,
+            SongPlayerMocks.WithSuccessfulPlayback(songPlayer).Object,
             (display ?? new Mock<IDisplay>()).Object,
             (console ?? new Mock<IConsoleEngine>()).Object,
             (favourites ?? new Mock<IFavourites>()).Object,
@@ -350,7 +399,7 @@ public class JukeboxEngineFavouritesTest
         return new JukeboxEngine(
             (songSources ?? new Mock<ISongSources>()).Object,
             (songList ?? new Mock<ISongList>()).Object,
-            (songPlayer ?? new Mock<ISongPlayer>()).Object,
+            SongPlayerMocks.WithSuccessfulPlayback(songPlayer).Object,
             (display ?? new Mock<IDisplay>()).Object,
             (console ?? new Mock<IConsoleEngine>()).Object,
             (favourites ?? new Mock<IFavourites>()).Object,

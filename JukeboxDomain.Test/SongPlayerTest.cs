@@ -35,6 +35,38 @@ public class SongPlayerTest
     }
 
     [Fact]
+    public void PlaySong_WithMissingFile_ReturnsFalse()
+    {
+        var displayMock = new Mock<IDisplay>();
+        using var player = new SongPlayer(displayMock.Object);
+
+        var result = player.PlaySong("nonexistent_file.mp3");
+
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void PlaySong_WithUndecodableFile_ShowsErrorAndDoesNotThrow()
+    {
+        var displayMock = new Mock<IDisplay>();
+        using var player = new SongPlayer(displayMock.Object);
+        var tempFile = Path.Combine(Path.GetTempPath(), $"not_audio_{Guid.NewGuid():N}.mp3");
+        File.WriteAllText(tempFile, "this is not audio data");
+
+        try
+        {
+            var result = player.PlaySong(tempFile);
+
+            Assert.False(result);
+            displayMock.Verify(x => x.WriteError(It.IsAny<string>()), Times.Once);
+        }
+        finally
+        {
+            File.Delete(tempFile);
+        }
+    }
+
+    [Fact]
     public void Dispose_CanBeCalledMultipleTimes()
     {
         // Arrange

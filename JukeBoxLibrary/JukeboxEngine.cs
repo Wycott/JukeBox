@@ -65,7 +65,11 @@ public class JukeboxEngine(
 
     private JukeboxStateType PlaySong(string selectedSong)
     {
-        SongPlayer.PlaySong(selectedSong);
+        if (!SongPlayer.PlaySong(selectedSong))
+        {
+            return JukeboxStateType.RequestSong;
+        }
+
         Favourites.RecordPlay(selectedSong);
         lastPlayedSong = selectedSong;
 

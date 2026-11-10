@@ -123,8 +123,8 @@ public class FavouritesTest : IDisposable
     {
         var favourites = new Favourites(tempFile, maxFavourites: 3);
 
-        // Build up 4 songs — each with distinct play counts higher than the next
-        // d=4, c=3, b=2, a=1 — but we add them in order so trim happens correctly
+        // d=4, c=3, b=2, then a new song a=1 triggers trim.
+        // a.mp3 was just played so it is kept; b.mp3 is the lowest remaining and is evicted.
         favourites.RecordPlay(@"C:\Music\d.mp3");
         favourites.RecordPlay(@"C:\Music\d.mp3");
         favourites.RecordPlay(@"C:\Music\d.mp3");
@@ -134,12 +134,13 @@ public class FavouritesTest : IDisposable
         favourites.RecordPlay(@"C:\Music\c.mp3");  // 3 plays
         favourites.RecordPlay(@"C:\Music\b.mp3");
         favourites.RecordPlay(@"C:\Music\b.mp3");  // 2 plays
-        favourites.RecordPlay(@"C:\Music\a.mp3");  // 1 play — triggers trim (4 entries), a.mp3 is lowest
+        favourites.RecordPlay(@"C:\Music\a.mp3");  // 1 play — triggers trim (4 entries)
 
         var top = favourites.GetTopFavourites();
 
         Assert.Equal(3, top.Count);
-        Assert.DoesNotContain(top, e => e.FullPath == @"C:\Music\a.mp3");
+        Assert.DoesNotContain(top, e => e.FullPath == @"C:\Music\b.mp3");
+        Assert.Contains(top, e => e.FullPath == @"C:\Music\a.mp3");
     }
 
     [Fact]
@@ -147,19 +148,61 @@ public class FavouritesTest : IDisposable
     {
         var favourites = new Favourites(tempFile, maxFavourites: 2);
 
-        // Build up 3 songs with distinct counts, then the 3rd triggers trim
         favourites.RecordPlay(@"C:\Music\popular.mp3");
         favourites.RecordPlay(@"C:\Music\popular.mp3");
         favourites.RecordPlay(@"C:\Music\popular.mp3");  // 3 plays
         favourites.RecordPlay(@"C:\Music\medium.mp3");
         favourites.RecordPlay(@"C:\Music\medium.mp3");   // 2 plays
-        favourites.RecordPlay(@"C:\Music\rare.mp3");     // 1 play — triggers trim, rare.mp3 removed
+        favourites.RecordPlay(@"C:\Music\rare.mp3");     // 1 play — triggers trim; rare.mp3 just played, medium.mp3 evicted
 
         var top = favourites.GetTopFavourites();
 
         Assert.Equal(2, top.Count);
         Assert.Equal(@"C:\Music\popular.mp3", top[0].FullPath);
-        Assert.Equal(@"C:\Music\medium.mp3", top[1].FullPath);
+        Assert.Equal(@"C:\Music\rare.mp3", top[1].FullPath);
+    }
+
+    [Fact]
+    public void Trim_WhenFullOfTies_NewSongIsKept()
+    {
+        var favourites = new Favourites(tempFile, maxFavourites: 3);
+
+        favourites.RecordPlay(@"C:\Music\one.mp3");
+        favourites.RecordPlay(@"C:\Music\two.mp3");
+        favourites.RecordPlay(@"C:\Music\three.mp3");
+        favourites.RecordPlay(@"C:\Music\latest.mp3");  // list is full of count-1 ties
+
+        var top = favourites.GetTopFavourites();
+
+        Assert.Equal(3, top.Count);
+        Assert.Contains(top, e => e.FullPath == @"C:\Music\latest.mp3");
+    }
+
+    [Fact]
+    public void Trim_EvictsLowestCountRatherThanNewSong()
+    {
+        var favourites = new Favourites(tempFile, maxFavourites: 2);
+
+        favourites.RecordPlay(@"C:\Music\popular.mp3");
+        favourites.RecordPlay(@"C:\Music\popular.mp3");
+        favourites.RecordPlay(@"C:\Music\once.mp3");
+        favourites.RecordPlay(@"C:\Music\latest.mp3");
+
+        var top = favourites.GetTopFavourites();
+
+        Assert.Equal(2, top.Count);
+        Assert.Equal(@"C:\Music\popular.mp3", top[0].FullPath);
+        Assert.Equal(@"C:\Music\latest.mp3", top[1].FullPath);
+    }
+
+    [Fact]
+    public void Trim_WithZeroMax_DoesNotThrow()
+    {
+        var favourites = new Favourites(tempFile, maxFavourites: 0);
+
+        var exception = Record.Exception(() => favourites.RecordPlay(@"C:\Music\song.mp3"));
+
+        Assert.Null(exception);
     }
 
     [Fact]
