@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\JukeboxTypes\JukeboxTypes.csproj" />
+  </ItemGroup>
+
 </Project>
