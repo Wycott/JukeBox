@@ -4,9 +4,11 @@ using JukeboxInterfaces;
 using JukeboxLibrary;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Runtime.Versioning;
 
 namespace Jukebox;
 
+[SupportedOSPlatform("windows")]
 internal static class Program
 {
     private static void Main()

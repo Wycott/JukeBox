@@ -1,4 +1,4 @@
-using System.Text.Json;
+using JukeboxDomain.Helpers;
 using JukeboxInterfaces;
 
 namespace JukeboxDomain;
@@ -7,18 +7,13 @@ public class Favourites : IFavourites
 {
     private readonly int maxFavourites;
     private readonly string filePath;
-    private Dictionary<string, int> playCounts;
-
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        WriteIndented = true
-    };
+    private readonly Dictionary<string, int> playCounts;
 
     public Favourites(string filePath, int maxFavourites = 100)
     {
         this.filePath = filePath;
         this.maxFavourites = maxFavourites;
-        playCounts = Load();
+        playCounts = JsonFile.Load<Dictionary<string, int>>(filePath);
     }
 
     public void RecordPlay(string fullPath)
@@ -86,33 +81,6 @@ public class Favourites : IFavourites
 
     private void Save()
     {
-        try
-        {
-            var json = JsonSerializer.Serialize(playCounts, JsonOptions);
-            File.WriteAllText(filePath, json);
-        }
-        catch (IOException)
-        {
-            // Best effort — don't crash if we can't write
-        }
-    }
-
-    private Dictionary<string, int> Load()
-    {
-        try
-        {
-            if (!File.Exists(filePath))
-            {
-                return new Dictionary<string, int>();
-            }
-
-            var json = File.ReadAllText(filePath);
-
-            return JsonSerializer.Deserialize<Dictionary<string, int>>(json) ?? new Dictionary<string, int>();
-        }
-        catch (Exception ex) when (ex is IOException or JsonException)
-        {
-            return new Dictionary<string, int>();
-        }
+        JsonFile.Save(filePath, playCounts);
     }
 }

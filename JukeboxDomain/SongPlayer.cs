@@ -1,12 +1,14 @@
 using JukeboxInterfaces;
+using System.Runtime.Versioning;
 using NAudio.Wave;
 
 namespace JukeboxDomain;
 
+[SupportedOSPlatform("windows")]
 public class SongPlayer(IDisplay displayEngine) : ISongPlayer, IDisposable
 {
     private AudioFileReader? FileReader { get; set; }
-    private WaveOutEvent? Player { get; set; }
+    private WaveOut? Player { get; set; }
 
     private IDisplay DisplayEngine { get; } = displayEngine;
 
@@ -16,7 +18,7 @@ public class SongPlayer(IDisplay displayEngine) : ISongPlayer, IDisposable
         {
             StopAndDisposeCurrent();
             FileReader = new AudioFileReader(filename);
-            Player = new WaveOutEvent();
+            Player = new WaveOut();
             Player.Init(FileReader);
             Player.Play();
 

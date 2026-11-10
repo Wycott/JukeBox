@@ -11,65 +11,26 @@ public class FileSystemParser(IBanList banList) : IFileSystemParser
 
         var haveArtist = artist.Length > 0;
 
-        huntString = artist.Length > 0 ? "*" : PreparePattern(huntString);
+        huntString = haveArtist ? "*" : PreparePattern(huntString);
 
         foreach (var drive in mediaDrives.Sources)
         {
-            string[]? directories;
-            try
+            foreach (var possibleSongFile in SongFiles.Find(drive, huntString))
             {
-                directories = Directory.GetDirectories(drive);
-            }
-            catch (DirectoryNotFoundException)
-            {
-                continue;
-            }
-            catch (UnauthorizedAccessException)
-            {
-                continue;
-            }
-            catch (IOException)
-            {
-                continue;
-            }
+                if (banList.IsBanned(possibleSongFile))
+                {
+                    continue;
+                }
 
-            foreach (var possibleSongDirectory in directories)
-            {
-                try
+                if (!haveArtist || HaveASongByThisArtist(possibleSongFile, artist))
                 {
-                    foreach (var possibleSongFile in Directory.GetFiles(possibleSongDirectory, huntString, SearchOption.AllDirectories))
-                    {
-                        if (ExtensionsOk(possibleSongFile) && !banList.IsBanned(possibleSongFile))
-                        {
-                            if (!haveArtist || HaveASongByThisArtist(possibleSongFile, artist))
-                            {
-                                var shortPath = possibleSongFile.Replace(drive, "");
-                                retVal.Add(new Song { FullPath = possibleSongFile, ShortenedPath = shortPath });
-                            }
-                        }
-                    }
-                }
-                catch (UnauthorizedAccessException)
-                {
-                    // Standard...
-                }
-                catch (IOException)
-                {
-                    // Network or I/O issue with subdirectory
+                    var shortPath = possibleSongFile.Replace(drive, "");
+                    retVal.Add(new Song { FullPath = possibleSongFile, ShortenedPath = shortPath });
                 }
             }
         }
 
         return haveArtist ? retVal.OrderBy(_ => Random.Shared.Next()).ToList() : retVal;
-    }
-
-    private static readonly string[] ValidExtensions = [".mp3", ".m4a"];
-
-    private static bool ExtensionsOk(string candidate)
-    {
-        var extension = Path.GetExtension(candidate);
-
-        return ValidExtensions.Any(ext => ext.Equals(extension, StringComparison.OrdinalIgnoreCase));
     }
 
     private static string PreparePattern(string initialPattern)

@@ -1,4 +1,3 @@
-using System.Text.Json;
 using JukeboxDomain.Helpers;
 using JukeboxInterfaces;
 
@@ -7,17 +6,12 @@ namespace JukeboxDomain;
 public class BanList : IBanList
 {
     private readonly string filePath;
-    private List<string> bannedSongs;
-
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        WriteIndented = true
-    };
+    private readonly List<string> bannedSongs;
 
     public BanList(string filePath)
     {
         this.filePath = filePath;
-        bannedSongs = Load();
+        bannedSongs = JsonFile.Load<List<string>>(filePath);
     }
 
     public void Ban(string fullPath)
@@ -77,32 +71,6 @@ public class BanList : IBanList
 
     private void Save()
     {
-        try
-        {
-            var json = JsonSerializer.Serialize(bannedSongs, JsonOptions);
-            File.WriteAllText(filePath, json);
-        }
-        catch (IOException)
-        {
-            // Best effort — don't crash if we can't write
-        }
-    }
-
-    private List<string> Load()
-    {
-        try
-        {
-            if (!File.Exists(filePath))
-            {
-                return [];
-            }
-
-            var json = File.ReadAllText(filePath);
-            return JsonSerializer.Deserialize<List<string>>(json) ?? [];
-        }
-        catch (Exception ex) when (ex is IOException or JsonException)
-        {
-            return [];
-        }
+        JsonFile.Save(filePath, bannedSongs);
     }
 }
