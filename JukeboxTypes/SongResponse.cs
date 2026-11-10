@@ -1,4 +1,4 @@
-namespace JukeboxInterfaces;
+namespace JukeboxTypes;
 
 public enum SongResponse
 {

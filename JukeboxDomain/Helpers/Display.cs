@@ -1,4 +1,5 @@
 ﻿using JukeboxInterfaces;
+using JukeboxTypes;
 
 namespace JukeboxDomain.Helpers;
 

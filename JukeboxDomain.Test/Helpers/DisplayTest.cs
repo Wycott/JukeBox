@@ -1,5 +1,6 @@
 ﻿using JukeboxDomain.Helpers;
 using JukeboxInterfaces;
+using JukeboxTypes;
 using Moq;
 
 namespace JukeboxDomain.Test.Helpers;

@@ -1,4 +1,6 @@
-﻿namespace JukeboxInterfaces;
+﻿using JukeboxTypes;
+
+namespace JukeboxInterfaces;
 
 public interface IDisplay
 {

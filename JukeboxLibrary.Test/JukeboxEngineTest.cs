@@ -1,5 +1,6 @@
 ﻿using AiAnnotations;
 using JukeboxInterfaces;
+using JukeboxTypes;
 using Moq;
 
 namespace JukeboxLibrary.Test;
