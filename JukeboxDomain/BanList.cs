@@ -37,7 +37,9 @@ public class BanList : IBanList
         foreach (var banned in bannedSongs)
         {
             if (string.Equals(banned, fullPath, StringComparison.OrdinalIgnoreCase))
+            {
                 continue;
+            }
 
             var bannedName = StripTrackNumber(Path.GetFileNameWithoutExtension(banned));
 
@@ -60,11 +62,16 @@ public class BanList : IBanList
         // Remove leading track numbers like "12 " or "09 "
         var trimmed = name.TrimStart();
         var i = 0;
+
         while (i < trimmed.Length && char.IsDigit(trimmed[i]))
+        {
             i++;
+        }
 
         if (i > 0 && i < trimmed.Length && trimmed[i] == ' ')
+        {
             return trimmed[(i + 1)..];
+        }
 
         return trimmed;
     }
