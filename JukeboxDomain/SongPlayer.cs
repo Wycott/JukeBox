@@ -26,7 +26,15 @@ public class SongPlayer(IDisplay displayEngine) : ISongPlayer, IDisposable
         {
             // Playback is a boundary: unreadable files, unsupported formats, missing drives
             // and audio device errors should never take the jukebox down.
-            StopAndDisposeCurrent();
+            try
+            {
+                StopAndDisposeCurrent();
+            }
+            catch (Exception)
+            {
+                // The device is already broken; there is nothing more to clean up.
+            }
+
             DisplayEngine.WriteError("Internal error - please pick another song");
 
             return false;
@@ -35,17 +43,27 @@ public class SongPlayer(IDisplay displayEngine) : ISongPlayer, IDisposable
 
     private void StopAndDisposeCurrent()
     {
-        if (Player != null)
-        {
-            Player.Stop();
-            Player.Dispose();
-            Player = null;
-        }
+        // Detach first so a failing Stop or Dispose can't leave stale objects behind
+        // to be stopped again on the next call.
+        var player = Player;
+        var fileReader = FileReader;
+        Player = null;
+        FileReader = null;
 
-        if (FileReader != null)
+        try
         {
-            FileReader.Dispose();
-            FileReader = null;
+            player?.Stop();
+        }
+        finally
+        {
+            try
+            {
+                player?.Dispose();
+            }
+            finally
+            {
+                fileReader?.Dispose();
+            }
         }
     }
 

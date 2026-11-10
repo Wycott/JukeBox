@@ -83,7 +83,7 @@ public class JukeboxEngineTest
     }
 
     [Fact]
-    public void Start_WhenPlaybackFails_DoesNotRecordFavouriteOrSetCurrentSong()
+    public void Start_WhenPlaybackFails_DoesNotRecordFavouriteButRemoveTargetsFailedSong()
     {
         var songListMock = new Mock<ISongList>();
         var songPlayerMock = new Mock<ISongPlayer>();
@@ -111,8 +111,91 @@ public class JukeboxEngineTest
 
         songPlayerMock.Verify(x => x.PlaySong("broken.mp3"), Times.Once);
         favouritesMock.Verify(x => x.RecordPlay(It.IsAny<string>()), Times.Never);
-        favouritesMock.Verify(x => x.Remove(It.IsAny<string>()), Times.Never);
-        displayMock.Verify(x => x.WriteError("No song has been played yet"), Times.Once);
+        favouritesMock.Verify(x => x.Remove("broken.mp3"), Times.Once);
+        displayMock.Verify(x => x.WriteError("No song has been played yet"), Times.Never);
+    }
+
+    [Fact]
+    public void Start_WhenGoodSongThenFailedSong_BanTargetsFailedSong()
+    {
+        var songPlayerMock = new Mock<ISongPlayer>();
+        var consoleMock = new Mock<IConsoleEngine>();
+        var favouritesMock = new Mock<IFavourites>();
+        var banListMock = new Mock<IBanList>();
+
+        var goodPath = Path.Combine("C:", "Music", "good.mp3");
+        var brokenPath = Path.Combine("C:", "Music", "broken.mp3");
+        favouritesMock.SetupSequence(x => x.GetRandomFavourite())
+            .Returns(new FavouriteEntry(goodPath, 5))
+            .Returns(new FavouriteEntry(brokenPath, 5));
+        songPlayerMock.Setup(x => x.PlaySong(goodPath)).Returns(true);
+        songPlayerMock.Setup(x => x.PlaySong(brokenPath)).Returns(false);
+
+        var callCount = 0;
+        consoleMock.Setup(x => x.ReadLine()).Returns(() => callCount++ switch
+        {
+            0 => ":f",
+            1 => ":n",
+            2 => ":b",
+            _ => ":q"
+        });
+
+        var engine = CreateEngine(songPlayer: songPlayerMock, console: consoleMock, favourites: favouritesMock, banList: banListMock);
+        engine.Start();
+
+        banListMock.Verify(x => x.Ban(brokenPath), Times.Once);
+        banListMock.Verify(x => x.Ban(goodPath), Times.Never);
+    }
+
+    [Fact]
+    public void Start_WithF_WhenFavouriteFileIsMissing_RemovesItFromFavourites()
+    {
+        var songPlayerMock = new Mock<ISongPlayer>();
+        var displayMock = new Mock<IDisplay>();
+        var consoleMock = new Mock<IConsoleEngine>();
+        var favouritesMock = new Mock<IFavourites>();
+
+        var missingPath = Path.Combine(Path.GetTempPath(), $"missing_{Guid.NewGuid():N}.mp3");
+        favouritesMock.Setup(x => x.GetRandomFavourite()).Returns(new FavouriteEntry(missingPath, 5));
+        songPlayerMock.Setup(x => x.PlaySong(It.IsAny<string>())).Returns(false);
+
+        var callCount = 0;
+        consoleMock.Setup(x => x.ReadLine()).Returns(() => callCount++ == 0 ? ":f" : ":q");
+
+        var engine = CreateEngine(songPlayer: songPlayerMock, display: displayMock, console: consoleMock, favourites: favouritesMock);
+        engine.Start();
+
+        favouritesMock.Verify(x => x.Remove(missingPath), Times.Once);
+        favouritesMock.Verify(x => x.RecordPlay(It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact]
+    public void Start_WithF_WhenExistingFavouriteFailsToPlay_KeepsIt()
+    {
+        var songPlayerMock = new Mock<ISongPlayer>();
+        var consoleMock = new Mock<IConsoleEngine>();
+        var favouritesMock = new Mock<IFavourites>();
+
+        var existingPath = Path.Combine(Path.GetTempPath(), $"exists_{Guid.NewGuid():N}.mp3");
+        File.WriteAllText(existingPath, "not audio");
+
+        try
+        {
+            favouritesMock.Setup(x => x.GetRandomFavourite()).Returns(new FavouriteEntry(existingPath, 5));
+            songPlayerMock.Setup(x => x.PlaySong(It.IsAny<string>())).Returns(false);
+
+            var callCount = 0;
+            consoleMock.Setup(x => x.ReadLine()).Returns(() => callCount++ == 0 ? ":f" : ":q");
+
+            var engine = CreateEngine(songPlayer: songPlayerMock, console: consoleMock, favourites: favouritesMock);
+            engine.Start();
+
+            favouritesMock.Verify(x => x.Remove(It.IsAny<string>()), Times.Never);
+        }
+        finally
+        {
+            File.Delete(existingPath);
+        }
     }
 
     [Fact]
