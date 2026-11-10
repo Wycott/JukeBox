@@ -65,15 +65,33 @@ public class JukeboxEngine(
 
     private JukeboxStateType PlaySong(string selectedSong)
     {
+        // The selected song becomes "current" even when it fails, so :r and :b act on it
+        // rather than on whatever played before.
+        lastPlayedSong = selectedSong;
+
         if (!SongPlayer.PlaySong(selectedSong))
         {
+            RemoveMissingFavourite(selectedSong);
             return JukeboxStateType.RequestSong;
         }
 
         Favourites.RecordPlay(selectedSong);
-        lastPlayedSong = selectedSong;
 
         return JukeboxStateType.RequestSong;
+    }
+
+    private void RemoveMissingFavourite(string selectedSong)
+    {
+        // A favourite whose file no longer exists would otherwise keep being picked by :f and :n.
+        // Files that exist but fail (codec, device) are kept, since the failure may be temporary.
+        if (!inFavouritesMode || File.Exists(selectedSong))
+        {
+            return;
+        }
+
+        Favourites.Remove(selectedSong);
+        var fileName = Path.GetFileName(selectedSong);
+        DisplayEngine.WriteYellowText($"Removed missing file from favourites: {fileName}");
     }
 
     private JukeboxStateType SelectVersion(out string selectedSong)
