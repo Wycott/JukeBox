@@ -2,5 +2,5 @@
 
 public interface ISongPlayer : IDisposable
 {
-    void PlaySong(string filename);
+    bool PlaySong(string filename);
 }

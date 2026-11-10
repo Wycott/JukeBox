@@ -1,30 +1,35 @@
-﻿using JukeboxInterfaces;
+using JukeboxInterfaces;
 using NAudio.Wave;
 
 namespace JukeboxDomain;
 
 public class SongPlayer(IDisplay displayEngine) : ISongPlayer, IDisposable
 {
-    private Mp3FileReader? FileReader { get; set; }
+    private AudioFileReader? FileReader { get; set; }
     private WaveOutEvent? Player { get; set; }
 
     private IDisplay DisplayEngine { get; } = displayEngine;
 
-    public void PlaySong(string filename)
+    public bool PlaySong(string filename)
     {
         try
         {
             StopAndDisposeCurrent();
-            FileReader = new Mp3FileReader(filename);
+            FileReader = new AudioFileReader(filename);
             Player = new WaveOutEvent();
             Player.Init(FileReader);
             Player.Play();
+
+            return true;
         }
-        catch (Exception ex) when (ex is InvalidOperationException
-                                       or FileNotFoundException
-                                       or ArgumentException)
+        catch (Exception)
         {
+            // Playback is a boundary: unreadable files, unsupported formats, missing drives
+            // and audio device errors should never take the jukebox down.
+            StopAndDisposeCurrent();
             DisplayEngine.WriteError("Internal error - please pick another song");
+
+            return false;
         }
     }
 
