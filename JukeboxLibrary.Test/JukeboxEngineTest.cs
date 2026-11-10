@@ -644,6 +644,127 @@ public class JukeboxEngineFavouritesTest
         songListMock.Verify(x => x.Build(songSourcesMock.Object, "l"), Times.Once);
     }
 
+    private static Mock<IFavourites> FavouritesGrowingFrom(int startCount, int maxFavourites)
+    {
+        // Each RecordPlay adds a new song, so Count goes up by one.
+        var favouritesMock = new Mock<IFavourites>();
+        var count = startCount;
+        favouritesMock.Setup(x => x.Count).Returns(() => count);
+        favouritesMock.Setup(x => x.MaxFavourites).Returns(maxFavourites);
+        favouritesMock.Setup(x => x.RecordPlay(It.IsAny<string>())).Callback(() => count++);
+        return favouritesMock;
+    }
+
+    private static Mock<IConsoleEngine> ConsoleTyping(params string[] lines)
+    {
+        var consoleMock = new Mock<IConsoleEngine>();
+        var callCount = 0;
+        consoleMock.Setup(x => x.ReadLine()).Returns(() => callCount < lines.Length ? lines[callCount++] : ":q");
+        return consoleMock;
+    }
+
+    private static Mock<ISongList> SongListWith(string fullPath)
+    {
+        var songMock = new Mock<ISong>();
+        songMock.Setup(x => x.FullPath).Returns(fullPath);
+        songMock.Setup(x => x.ShortenedPath).Returns(fullPath);
+
+        var songListMock = new Mock<ISongList>();
+        songListMock.Setup(x => x.SongCollection).Returns(new List<ISong> { songMock.Object });
+        return songListMock;
+    }
+
+    [Fact]
+    public void Start_WhenNewSongTakesFavouritesOverLimit_AddsItAndWarns()
+    {
+        var displayMock = new Mock<IDisplay>();
+        displayMock.Setup(x => x.IsThisTheRightSong(It.IsAny<string>())).Returns(SongResponse.Yes);
+        var favouritesMock = FavouritesGrowingFrom(startCount: 100, maxFavourites: 100);
+
+        var engine = CreateEngine(songList: SongListWith("new.mp3"), display: displayMock, console: ConsoleTyping("new"), favourites: favouritesMock);
+        engine.Start();
+
+        favouritesMock.Verify(x => x.RecordPlay("new.mp3"), Times.Once);
+        displayMock.Verify(x => x.WriteError("Favourites is over its limit (101 of 100) - use :t to trim"), Times.Once);
+    }
+
+    [Fact]
+    public void Start_WhenNewSongStaysWithinLimit_DoesNotWarn()
+    {
+        var displayMock = new Mock<IDisplay>();
+        displayMock.Setup(x => x.IsThisTheRightSong(It.IsAny<string>())).Returns(SongResponse.Yes);
+        var favouritesMock = FavouritesGrowingFrom(startCount: 99, maxFavourites: 100);
+
+        var engine = CreateEngine(songList: SongListWith("new.mp3"), display: displayMock, console: ConsoleTyping("new"), favourites: favouritesMock);
+        engine.Start();
+
+        displayMock.Verify(x => x.WriteError(It.Is<string>(s => s.StartsWith("Favourites is over its limit"))), Times.Never);
+    }
+
+    [Fact]
+    public void Start_WhenReplayingFavouriteWhileOverLimit_DoesNotWarn()
+    {
+        var displayMock = new Mock<IDisplay>();
+        displayMock.Setup(x => x.IsThisTheRightSong(It.IsAny<string>())).Returns(SongResponse.Yes);
+        var favouritesMock = new Mock<IFavourites>();
+        favouritesMock.Setup(x => x.Count).Returns(150);  // already over, and a replay doesn't grow it
+        favouritesMock.Setup(x => x.MaxFavourites).Returns(100);
+
+        var engine = CreateEngine(songList: SongListWith("old.mp3"), display: displayMock, console: ConsoleTyping("old"), favourites: favouritesMock);
+        engine.Start();
+
+        favouritesMock.Verify(x => x.RecordPlay("old.mp3"), Times.Once);
+        displayMock.Verify(x => x.WriteError(It.Is<string>(s => s.StartsWith("Favourites is over its limit"))), Times.Never);
+    }
+
+    [Theory]
+    [InlineData(":t")]
+    [InlineData(":T")]
+    public void Start_WithT_TrimsAndReportsWhatWasRemoved(string command)
+    {
+        var displayMock = new Mock<IDisplay>();
+        var favouritesMock = new Mock<IFavourites>();
+        favouritesMock.Setup(x => x.TrimLeastPlayed()).Returns(
+        [
+            new FavouriteEntry("a.mp3", 1),
+            new FavouriteEntry("b.mp3", 1)
+        ]);
+        favouritesMock.Setup(x => x.Count).Returns(98);
+
+        var engine = CreateEngine(display: displayMock, console: ConsoleTyping(command), favourites: favouritesMock);
+        engine.Start();
+
+        favouritesMock.Verify(x => x.TrimLeastPlayed(), Times.Once);
+        displayMock.Verify(x => x.WriteYellowText("Trimmed 2 favourites with 1 play (98 left)"), Times.Once);
+    }
+
+    [Fact]
+    public void Start_WithT_SingleEntryWithSeveralPlays_UsesSingularAndPluralCorrectly()
+    {
+        var displayMock = new Mock<IDisplay>();
+        var favouritesMock = new Mock<IFavourites>();
+        favouritesMock.Setup(x => x.TrimLeastPlayed()).Returns([new FavouriteEntry("a.mp3", 3)]);
+        favouritesMock.Setup(x => x.Count).Returns(5);
+
+        var engine = CreateEngine(display: displayMock, console: ConsoleTyping(":t"), favourites: favouritesMock);
+        engine.Start();
+
+        displayMock.Verify(x => x.WriteYellowText("Trimmed 1 favourite with 3 plays (5 left)"), Times.Once);
+    }
+
+    [Fact]
+    public void Start_WithT_WhenNoFavourites_ShowsError()
+    {
+        var displayMock = new Mock<IDisplay>();
+        var favouritesMock = new Mock<IFavourites>();
+        favouritesMock.Setup(x => x.TrimLeastPlayed()).Returns([]);
+
+        var engine = CreateEngine(display: displayMock, console: ConsoleTyping(":t"), favourites: favouritesMock);
+        engine.Start();
+
+        displayMock.Verify(x => x.WriteError("No favourites yet"), Times.Once);
+    }
+
     [Fact]
     public void Start_WithQuestionMark_ShowsHelpAgain()
     {
