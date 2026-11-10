@@ -42,6 +42,7 @@ public class Display(IConsoleEngine consoleEngine) : IDisplay
         Write("Play y/n/b? ");
         
         var consoleInput = ConsoleEngine.ReadAKey();
+
         ConsoleEngine.WriteALine();
 
         return InterpretResponse(consoleInput.Key);

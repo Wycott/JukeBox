@@ -76,6 +76,7 @@ public class JukeboxEngine(
         }
 
         var countBefore = Favourites.Count;
+
         Favourites.RecordPlay(selectedSong);
         WarnIfNewSongTookFavouritesOverLimit(countBefore);
 
@@ -104,13 +105,16 @@ public class JukeboxEngine(
         }
 
         Favourites.Remove(selectedSong);
+        
         var fileName = Path.GetFileName(selectedSong);
+        
         DisplayEngine.WriteYellowText($"Removed missing file from favourites: {fileName}");
     }
 
     private JukeboxStateType SelectVersion(out string selectedSong)
     {
         selectedSong = string.Empty;
+
         var userCancelled = false;
 
         foreach (var song in SongList.SongCollection)
@@ -121,6 +125,7 @@ public class JukeboxEngine(
             {
                 var skippedName = Path.GetFileName(song.FullPath);
                 var bannedName = Path.GetFileName(similarBanned);
+               
                 DisplayEngine.WriteYellowText($"  Skipped: {skippedName} (similar to banned: {bannedName})");
                 continue;
             }
@@ -136,8 +141,11 @@ public class JukeboxEngine(
             if (response == SongResponse.Ban)
             {
                 BanList.Ban(song.FullPath);
+             
                 var fileName = Path.GetFileName(song.FullPath);
+                
                 DisplayEngine.WriteYellowText($"Banned: {fileName}");
+                
                 continue;
             }
 
@@ -168,6 +176,7 @@ public class JukeboxEngine(
         }
 
         DisplayEngine.WriteError("Not Found!");
+
         return JukeboxStateType.RequestSong;
     }
 
@@ -177,6 +186,7 @@ public class JukeboxEngine(
         selectedSong = string.Empty;
 
         ConsoleEngine.WriteText("Enter pattern or command ");
+
         var input = ConsoleEngine.ReadLine();
 
         switch (input?.ToLowerInvariant())
@@ -216,6 +226,7 @@ public class JukeboxEngine(
         inFavouritesMode = false;
         lastPattern = input;
         selectedPattern = input;
+
         return JukeboxStateType.FindSong;
     }
 
@@ -236,6 +247,7 @@ public class JukeboxEngine(
         }
 
         DisplayEngine.WriteError("No previous pattern");
+
         return JukeboxStateType.RequestSong;
     }
 
@@ -248,6 +260,7 @@ public class JukeboxEngine(
             DisplayEngine.WriteError("No favourites yet");
             inFavouritesMode = false;
             selectedSong = string.Empty;
+
             return JukeboxStateType.RequestSong;
         }
 
@@ -256,6 +269,7 @@ public class JukeboxEngine(
             DisplayEngine.WriteError("No favourites yet");
             inFavouritesMode = false;
             selectedSong = string.Empty;
+
             return JukeboxStateType.RequestSong;
         }
 
@@ -267,6 +281,7 @@ public class JukeboxEngine(
             var bannedName = Path.GetFileName(similarBanned);
             DisplayEngine.WriteYellowText($"  Skipped: {skippedName} (similar to banned: {bannedName})");
             selectedSong = string.Empty;
+
             return JukeboxStateType.RequestSong;
         }
 
@@ -275,6 +290,7 @@ public class JukeboxEngine(
         ConsoleEngine.WriteText("Playing: ");
         DisplayEngine.WriteYellowText(fileName);
         selectedSong = favourite.FullPath;
+
         return JukeboxStateType.PlaySong;
     }
 
@@ -285,6 +301,7 @@ public class JukeboxEngine(
         if (favourites.Count == 0)
         {
             DisplayEngine.WriteError("No favourites yet");
+            
             return;
         }
 
@@ -302,7 +319,9 @@ public class JukeboxEngine(
             if (displayed % favouritesPageSize == 0 && displayed < favourites.Count)
             {
                 ConsoleEngine.WriteText("-- More (any key) or q to stop --");
+                
                 var key = ConsoleEngine.ReadAKey();
+                
                 ConsoleEngine.WriteALine();
 
                 if (key.Key == ConsoleKey.Q)
@@ -318,11 +337,14 @@ public class JukeboxEngine(
         if (string.IsNullOrEmpty(lastPlayedSong))
         {
             DisplayEngine.WriteError("No song has been played yet");
+
             return;
         }
 
         Favourites.Remove(lastPlayedSong);
+        
         var fileName = Path.GetFileName(lastPlayedSong);
+        
         DisplayEngine.WriteYellowText($"Removed: {fileName}");
     }
 
@@ -333,12 +355,14 @@ public class JukeboxEngine(
         if (removed.Count == 0)
         {
             DisplayEngine.WriteError("No favourites yet");
+
             return;
         }
 
         var playCount = removed[0].PlayCount;
         var songs = removed.Count == 1 ? "favourite" : "favourites";
         var plays = playCount == 1 ? "play" : "plays";
+
         DisplayEngine.WriteYellowText(
             $"Trimmed {removed.Count} {songs} with {playCount} {plays} ({Favourites.Count} left)");
     }
@@ -348,11 +372,14 @@ public class JukeboxEngine(
         if (string.IsNullOrEmpty(lastPlayedSong))
         {
             DisplayEngine.WriteError("No song has been played yet");
+
             return;
         }
 
         BanList.Ban(lastPlayedSong);
+        
         var fileName = Path.GetFileName(lastPlayedSong);
+        
         DisplayEngine.WriteYellowText($"Banned: {fileName}");
     }
 
@@ -363,6 +390,7 @@ public class JukeboxEngine(
         if (banned.Count == 0)
         {
             DisplayEngine.WriteError("No banned songs");
+
             return;
         }
 
@@ -372,6 +400,7 @@ public class JukeboxEngine(
         foreach (var song in banned)
         {
             var fileName = Path.GetFileName(song);
+
             DisplayEngine.WriteYellowText($"  {fileName}");
         }
     }
