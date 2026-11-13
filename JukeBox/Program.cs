@@ -22,6 +22,8 @@ internal static class Program
 
         var maxFavourites = configuration.GetValue("Favourites:MaxStored", 100);
         var favouritesPageSize = configuration.GetValue("Favourites:PageSize", 20);
+        var interSongDelaySeconds = configuration.GetValue("Favourites:InterSongDelay", 3.0);
+        var interSongDelay = TimeSpan.FromSeconds(Math.Max(0, interSongDelaySeconds));
         var favouritesPath = Path.Combine(AppContext.BaseDirectory, "favourites.json");
         var bannedPath = Path.Combine(AppContext.BaseDirectory, "banned.json");
 
@@ -39,7 +41,8 @@ internal static class Program
                 sp.GetRequiredService<IConsoleEngine>(),
                 sp.GetRequiredService<IFavourites>(),
                 sp.GetRequiredService<IBanList>(),
-                favouritesPageSize))
+                favouritesPageSize,
+                interSongDelay))
             .AddSingleton<ISongSources>(sp => new SongSources(sp.GetRequiredService<IDisplay>(), songSourcePaths))
             .AddSingleton<ISongList, SongList>()
             .AddSingleton<ISongPlayer, SongPlayer>()
