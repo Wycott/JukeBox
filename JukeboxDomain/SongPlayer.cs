@@ -12,6 +12,8 @@ public class SongPlayer(IDisplay displayEngine) : ISongPlayer
 
     private IDisplay DisplayEngine { get; } = displayEngine;
 
+    public event EventHandler? SongFinished;
+
     public bool PlaySong(string filename)
     {
         try
@@ -19,6 +21,7 @@ public class SongPlayer(IDisplay displayEngine) : ISongPlayer
             StopAndDisposeCurrent();
             FileReader = new AudioFileReader(filename);
             Player = new WaveOut();
+            Player.PlaybackStopped += OnPlaybackStopped;
             Player.Init(FileReader);
             Player.Play();
 
@@ -43,6 +46,19 @@ public class SongPlayer(IDisplay displayEngine) : ISongPlayer
         }
     }
 
+    private void OnPlaybackStopped(object? sender, StoppedEventArgs e)
+    {
+        // Ignore the stop if it came from a player that has since been replaced.
+        if (!ReferenceEquals(sender, Player))
+        {
+            return;
+        }
+
+        // The event arrives on the audio callback thread, where disposing the device
+        // (which playing the next song does) can deadlock. Hand it off instead.
+        Task.Run(() => SongFinished?.Invoke(this, EventArgs.Empty));
+    }
+
     private void StopAndDisposeCurrent()
     {
         // Detach first so a failing Stop or Dispose can't leave stale objects behind
@@ -51,6 +67,12 @@ public class SongPlayer(IDisplay displayEngine) : ISongPlayer
         var fileReader = FileReader;
         Player = null;
         FileReader = null;
+
+        // Stopping on purpose is not "finished", so don't let Stop raise it.
+        if (player != null)
+        {
+            player.PlaybackStopped -= OnPlaybackStopped;
+        }
 
         try
         {
