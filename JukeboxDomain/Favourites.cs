@@ -7,6 +7,8 @@ public class Favourites : IFavourites
 {
     private readonly string filePath;
     private readonly Dictionary<string, int> playCounts;
+    private readonly HashSet<string> pickedThisCycle = [];
+    private string? lastPicked;
 
     public Favourites(string filePath, int maxFavourites = 100)
     {
@@ -51,6 +53,8 @@ public class Favourites : IFavourites
 
     public void Remove(string fullPath)
     {
+        pickedThisCycle.Remove(fullPath);
+
         if (playCounts.Remove(fullPath))
         {
             Save();
@@ -59,24 +63,43 @@ public class Favourites : IFavourites
 
     public IReadOnlyList<FavouriteEntry> GetTopFavourites()
     {
+        // Ties are broken by path so ranks are stable between calls.
         return playCounts
             .OrderByDescending(kvp => kvp.Value)
-            .Select(kvp => new FavouriteEntry(kvp.Key, kvp.Value))
+            .ThenBy(kvp => kvp.Key, StringComparer.OrdinalIgnoreCase)
+            .Select((kvp, index) => new FavouriteEntry(kvp.Key, kvp.Value, index + 1))
             .ToList();
     }
 
     public FavouriteEntry? GetRandomFavourite()
     {
-        if (playCounts.Count == 0)
+        var ranked = GetTopFavourites();
+
+        if (ranked.Count == 0)
         {
             return null;
         }
 
-        var entries = playCounts.Keys.ToList();
-        var index = Random.Shared.Next(entries.Count);
-        var key = entries[index];
+        var candidates = ranked.Where(e => !pickedThisCycle.Contains(e.FullPath)).ToList();
 
-        return new FavouriteEntry(key, playCounts[key]);
+        if (candidates.Count == 0)
+        {
+            pickedThisCycle.Clear();
+
+            // Don't let the last song of one cycle also be the first of the next.
+            candidates = ranked.Where(e => e.FullPath != lastPicked).ToList();
+
+            if (candidates.Count == 0)
+            {
+                candidates = ranked.ToList();
+            }
+        }
+
+        var picked = candidates[Random.Shared.Next(candidates.Count)];
+        pickedThisCycle.Add(picked.FullPath);
+        lastPicked = picked.FullPath;
+
+        return picked;
     }
 
     private void Save()

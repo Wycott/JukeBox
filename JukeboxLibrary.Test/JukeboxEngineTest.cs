@@ -525,7 +525,8 @@ public class JukeboxEngineFavouritesTest
 
         var favPath = Path.Combine("C:", "Music", "fav.mp3");
         favouritesMock.Setup(x => x.GetRandomFavourite())
-            .Returns(new FavouriteEntry(favPath, 10));
+            .Returns(new FavouriteEntry(favPath, 10, 3));
+        favouritesMock.Setup(x => x.Count).Returns(7);
 
         var callCount = 0;
         consoleMock.Setup(x => x.ReadLine()).Returns(() => callCount++ == 0 ? ":f" : ":q");
@@ -535,7 +536,7 @@ public class JukeboxEngineFavouritesTest
 
         songPlayerMock.Verify(x => x.PlaySong(favPath), Times.Once);
         displayMock.Verify(x => x.WriteYellowText("fav.mp3"), Times.Once);
-        consoleMock.Verify(x => x.WriteText("Playing: "), Times.Once);
+        consoleMock.Verify(x => x.WriteText("Playing 3 of 7: "), Times.Once);
     }
 
     [Fact]
