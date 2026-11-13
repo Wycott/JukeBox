@@ -71,6 +71,11 @@ public class Favourites : IFavourites
             .ToList();
     }
 
+    public int? GetRank(string fullPath)
+    {
+        return GetTopFavourites().FirstOrDefault(e => e.FullPath == fullPath)?.Rank;
+    }
+
     public FavouriteEntry? GetRandomFavourite()
     {
         var ranked = GetTopFavourites();

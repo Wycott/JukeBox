@@ -167,6 +167,32 @@ public class FavouritesTest : IDisposable
     }
 
     [Fact]
+    public void GetRank_ReflectsPlaysRecordedSincePicking()
+    {
+        var favourites = new Favourites(tempFile);
+        favourites.RecordPlay(@"C:\Music\a.mp3");
+        favourites.RecordPlay(@"C:\Music\a.mp3");
+        favourites.RecordPlay(@"C:\Music\b.mp3");
+
+        Assert.Equal(2, favourites.GetRank(@"C:\Music\b.mp3"));
+
+        favourites.RecordPlay(@"C:\Music\b.mp3");
+        favourites.RecordPlay(@"C:\Music\b.mp3");
+
+        Assert.Equal(1, favourites.GetRank(@"C:\Music\b.mp3"));
+        Assert.Equal(2, favourites.GetRank(@"C:\Music\a.mp3"));
+    }
+
+    [Fact]
+    public void GetRank_UnknownSong_ReturnsNull()
+    {
+        var favourites = new Favourites(tempFile);
+        favourites.RecordPlay(@"C:\Music\a.mp3");
+
+        Assert.Null(favourites.GetRank(@"C:\Music\missing.mp3"));
+    }
+
+    [Fact]
     public void GetTopFavourites_AssignsRanksMostPlayedFirst()
     {
         var favourites = new Favourites(tempFile);

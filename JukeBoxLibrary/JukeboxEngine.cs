@@ -150,7 +150,24 @@ public class JukeboxEngine(
         Favourites.RecordPlay(selectedSong);
         WarnIfNewSongTookFavouritesOverLimit(countBefore);
 
+        if (inFavouritesMode)
+        {
+            AnnounceFavourite(selectedSong);
+        }
+
         return true;
+    }
+
+    private void AnnounceFavourite(string selectedSong)
+    {
+        // Ranked after the play is recorded: this play can move the song up the list,
+        // and a rank taken before it would already be out of date.
+        var rank = Favourites.GetRank(selectedSong);
+        var fileName = Path.GetFileName(selectedSong);
+
+        ConsoleEngine.WriteALine();
+        ConsoleEngine.WriteText(rank == null ? "Playing: " : $"Playing {rank} of {Favourites.Count}: ");
+        DisplayEngine.WriteYellowText(fileName);
     }
 
     private void WarnIfNewSongTookFavouritesOverLimit(int countBefore)
@@ -169,15 +186,22 @@ public class JukeboxEngine(
     {
         // A favourite whose file no longer exists would otherwise keep being picked by :f and :n.
         // Files that exist but fail (codec, device) are kept, since the failure may be temporary.
-        if (!inFavouritesMode || File.Exists(selectedSong))
+        if (!inFavouritesMode)
         {
             return;
         }
 
-        Favourites.Remove(selectedSong);
-        
         var fileName = Path.GetFileName(selectedSong);
-        
+
+        if (File.Exists(selectedSong))
+        {
+            // Favourites aren't announced until they play, so name the one that failed.
+            DisplayEngine.WriteYellowText($"Couldn't play favourite: {fileName}");
+            return;
+        }
+
+        Favourites.Remove(selectedSong);
+
         DisplayEngine.WriteYellowText($"Removed missing file from favourites: {fileName}");
     }
 
@@ -366,10 +390,6 @@ public class JukeboxEngine(
             return JukeboxStateType.RequestSong;
         }
 
-        var fileName = Path.GetFileName(favourite.FullPath);
-        ConsoleEngine.WriteALine();
-        ConsoleEngine.WriteText($"Playing {favourite.Rank} of {Favourites.Count}: ");
-        DisplayEngine.WriteYellowText(fileName);
         selectedSong = favourite.FullPath;
 
         return JukeboxStateType.PlaySong;
