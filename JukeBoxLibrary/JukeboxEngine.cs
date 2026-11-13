@@ -11,7 +11,8 @@ public class JukeboxEngine(
     IConsoleEngine consoleEngine,
     IFavourites favourites,
     IBanList banList,
-    int favouritesPageSize = 20)
+    int favouritesPageSize = 20,
+    TimeSpan interSongDelay = default)
     : IJukeboxEngine
 {
     private IConsoleEngine ConsoleEngine { get; } = consoleEngine;
@@ -26,6 +27,10 @@ public class JukeboxEngine(
     private string lastPlayedSong = string.Empty;
     private bool inFavouritesMode;
     private bool stopped;
+
+    // Bumped on every play attempt, so a pause before an automatic play can tell
+    // whether the user started something else while it was waiting.
+    private int playGeneration;
 
     // Songs finishing are reported on a background thread, so anything that plays songs
     // or changes engine state holds this lock.
@@ -54,9 +59,35 @@ public class JukeboxEngine(
 
     private void OnSongFinished(object? sender, EventArgs e)
     {
+        int generationBeforePause;
+
         lock (stateLock)
         {
             if (stopped || !inFavouritesMode)
+            {
+                return;
+            }
+
+            generationBeforePause = playGeneration;
+
+            if (interSongDelay > TimeSpan.Zero)
+            {
+                ConsoleEngine.WriteALine();
+                ConsoleEngine.WriteText("Queuing the next song...");
+            }
+        }
+
+        // Pause outside the lock so the user can still type commands meanwhile.
+        if (interSongDelay > TimeSpan.Zero)
+        {
+            Thread.Sleep(interSongDelay);
+        }
+
+        lock (stateLock)
+        {
+            // During the pause the user may have quit, searched for a song (leaving
+            // favourites mode) or played one with :f or :n; any of those wins.
+            if (stopped || !inFavouritesMode || playGeneration != generationBeforePause)
             {
                 return;
             }
@@ -138,6 +169,7 @@ public class JukeboxEngine(
         // The selected song becomes "current" even when it fails, so :r and :b act on it
         // rather than on whatever played before.
         lastPlayedSong = selectedSong;
+        playGeneration++;
 
         if (!SongPlayer.PlaySong(selectedSong))
         {

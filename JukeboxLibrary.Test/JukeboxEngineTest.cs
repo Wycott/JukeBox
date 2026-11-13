@@ -462,7 +462,8 @@ public class JukeboxEngineFavouritesTest
         Mock<IDisplay>? display = null,
         Mock<IConsoleEngine>? console = null,
         Mock<IFavourites>? favourites = null,
-        Mock<IBanList>? banList = null)
+        Mock<IBanList>? banList = null,
+        TimeSpan interSongDelay = default)
     {
         return new JukeboxEngine(
             (songSources ?? new Mock<ISongSources>()).Object,
@@ -471,7 +472,8 @@ public class JukeboxEngineFavouritesTest
             (display ?? new Mock<IDisplay>()).Object,
             (console ?? new Mock<IConsoleEngine>()).Object,
             (favourites ?? new Mock<IFavourites>()).Object,
-            (banList ?? new Mock<IBanList>()).Object);
+            (banList ?? new Mock<IBanList>()).Object,
+            interSongDelay: interSongDelay);
     }
 
     [Fact]
@@ -674,6 +676,112 @@ public class JukeboxEngineFavouritesTest
 
         favouritesMock.Verify(x => x.GetRandomFavourite(), Times.Never);
         songPlayerMock.Verify(x => x.PlaySong(It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact]
+    public void SongFinished_WithInterSongDelay_ShowsQueuingThenPlaysNext()
+    {
+        var songPlayerMock = new Mock<ISongPlayer>();
+        var consoleMock = new Mock<IConsoleEngine>();
+        var favouritesMock = new Mock<IFavourites>();
+
+        var firstPath = Path.Combine("C:", "Music", "first.mp3");
+        var secondPath = Path.Combine("C:", "Music", "second.mp3");
+        favouritesMock.Setup(x => x.Count).Returns(2);
+        favouritesMock.SetupSequence(x => x.GetRandomFavourite())
+            .Returns(new FavouriteEntry(firstPath, 5, 1))
+            .Returns(new FavouriteEntry(secondPath, 3, 2));
+
+        var callCount = 0;
+        consoleMock.Setup(x => x.ReadLine()).Returns(() =>
+        {
+            if (callCount++ == 0)
+            {
+                return ":f";
+            }
+
+            songPlayerMock.Raise(x => x.SongFinished += null, EventArgs.Empty);
+            return ":q";
+        });
+
+        var engine = CreateEngine(songPlayer: songPlayerMock, console: consoleMock, favourites: favouritesMock,
+            interSongDelay: TimeSpan.FromMilliseconds(10));
+        engine.Start();
+
+        consoleMock.Verify(x => x.WriteText("Queuing the next song..."), Times.Once);
+        songPlayerMock.Verify(x => x.PlaySong(secondPath), Times.Once);
+    }
+
+    [Fact]
+    public void SongFinished_WithNoInterSongDelay_DoesNotShowQueuing()
+    {
+        var songPlayerMock = new Mock<ISongPlayer>();
+        var consoleMock = new Mock<IConsoleEngine>();
+        var favouritesMock = new Mock<IFavourites>();
+
+        var favPath = Path.Combine("C:", "Music", "fav.mp3");
+        favouritesMock.Setup(x => x.Count).Returns(1);
+        favouritesMock.Setup(x => x.GetRandomFavourite()).Returns(new FavouriteEntry(favPath, 5, 1));
+
+        var callCount = 0;
+        consoleMock.Setup(x => x.ReadLine()).Returns(() =>
+        {
+            if (callCount++ == 0)
+            {
+                return ":f";
+            }
+
+            songPlayerMock.Raise(x => x.SongFinished += null, EventArgs.Empty);
+            return ":q";
+        });
+
+        var engine = CreateEngine(songPlayer: songPlayerMock, console: consoleMock, favourites: favouritesMock);
+        engine.Start();
+
+        consoleMock.Verify(x => x.WriteText("Queuing the next song..."), Times.Never);
+        songPlayerMock.Verify(x => x.PlaySong(favPath), Times.Exactly(2));
+    }
+
+    [Fact]
+    public void SongFinished_WhenUserPlaysSongDuringPause_SkipsAutomaticPlay()
+    {
+        var songPlayerMock = new Mock<ISongPlayer>();
+        var consoleMock = new Mock<IConsoleEngine>();
+        var favouritesMock = new Mock<IFavourites>();
+
+        var favPath = Path.Combine("C:", "Music", "fav.mp3");
+        favouritesMock.Setup(x => x.Count).Returns(1);
+        favouritesMock.Setup(x => x.GetRandomFavourite()).Returns(new FavouriteEntry(favPath, 5, 1));
+
+        using var pauseStarted = new ManualResetEventSlim();
+        consoleMock.Setup(x => x.WriteText("Queuing the next song...")).Callback(pauseStarted.Set);
+
+        Task? songFinished = null;
+        var callCount = 0;
+        consoleMock.Setup(x => x.ReadLine()).Returns(() =>
+        {
+            switch (callCount++)
+            {
+                case 0:
+                    return ":f";
+                case 1:
+                    // The song ends on a background thread, as it does for real; the user
+                    // presses :n while the jukebox is pausing before the next song.
+                    songFinished = Task.Run(() => songPlayerMock.Raise(x => x.SongFinished += null, EventArgs.Empty));
+                    Assert.True(pauseStarted.Wait(TimeSpan.FromSeconds(5)));
+                    return ":n";
+                default:
+                    Assert.True(songFinished!.Wait(TimeSpan.FromSeconds(5)));
+                    return ":q";
+            }
+        });
+
+        var engine = CreateEngine(songPlayer: songPlayerMock, console: consoleMock, favourites: favouritesMock,
+            interSongDelay: TimeSpan.FromMilliseconds(500));
+        engine.Start();
+
+        // Once for :f and once for :n; the pause must not add a third.
+        songPlayerMock.Verify(x => x.PlaySong(favPath), Times.Exactly(2));
     }
 
     [Fact]
