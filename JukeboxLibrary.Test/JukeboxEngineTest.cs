@@ -384,6 +384,121 @@ public class JukeboxEngineNextPatternTest
     }
 
     [Fact]
+    public void Start_WithS_OffersRandomSongAndPlaysIt()
+    {
+        var songSourcesMock = new Mock<ISongSources>();
+        var songListMock = new Mock<ISongList>();
+        var songPlayerMock = new Mock<ISongPlayer>();
+        var displayMock = new Mock<IDisplay>();
+        var consoleMock = new Mock<IConsoleEngine>();
+        var favouritesMock = new Mock<IFavourites>();
+
+        var first = new Mock<ISong>();
+        first.Setup(x => x.FullPath).Returns("first.mp3");
+        first.Setup(x => x.ShortenedPath).Returns("first");
+        var second = new Mock<ISong>();
+        second.Setup(x => x.FullPath).Returns("second.mp3");
+        second.Setup(x => x.ShortenedPath).Returns("second");
+        songListMock.Setup(x => x.SongCollection).Returns(new List<ISong> { first.Object, second.Object });
+
+        // "n" to the first random song, "y" to the next.
+        displayMock.SetupSequence(x => x.IsThisTheRightSong(It.IsAny<string>()))
+            .Returns(SongResponse.No)
+            .Returns(SongResponse.Yes);
+
+        var callCount = 0;
+        consoleMock.Setup(x => x.ReadLine()).Returns(() => callCount++ == 0 ? ":s" : ":q");
+
+        var engine = CreateEngine(songSourcesMock, songListMock, songPlayerMock, displayMock, consoleMock, favouritesMock);
+        engine.Start();
+
+        songListMock.Verify(x => x.BuildShuffled(songSourcesMock.Object), Times.Once);
+        displayMock.Verify(x => x.IsThisTheRightSong("first"), Times.Once);
+        displayMock.Verify(x => x.IsThisTheRightSong("second"), Times.Once);
+        songPlayerMock.Verify(x => x.PlaySong("first.mp3"), Times.Never);
+        songPlayerMock.Verify(x => x.PlaySong("second.mp3"), Times.Once);
+        favouritesMock.Verify(x => x.RecordPlay("second.mp3"), Times.Once);
+    }
+
+    [Fact]
+    public void Start_WithS_WhenNoSongs_ShowsError()
+    {
+        var songListMock = new Mock<ISongList>();
+        var displayMock = new Mock<IDisplay>();
+        var consoleMock = new Mock<IConsoleEngine>();
+
+        songListMock.Setup(x => x.SongCollection).Returns(new List<ISong>());
+
+        var callCount = 0;
+        consoleMock.Setup(x => x.ReadLine()).Returns(() => callCount++ == 0 ? ":s" : ":q");
+
+        var engine = CreateEngine(songList: songListMock, display: displayMock, console: consoleMock);
+        engine.Start();
+
+        displayMock.Verify(x => x.WriteError("No songs found!"), Times.Once);
+        displayMock.Verify(x => x.IsThisTheRightSong(It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact]
+    public void Start_WithS_ThenN_PicksAnotherRandomSong()
+    {
+        var songListMock = new Mock<ISongList>();
+        var displayMock = new Mock<IDisplay>();
+        var consoleMock = new Mock<IConsoleEngine>();
+
+        var song = new Mock<ISong>();
+        song.Setup(x => x.FullPath).Returns("song.mp3");
+        song.Setup(x => x.ShortenedPath).Returns("song");
+        songListMock.Setup(x => x.SongCollection).Returns(new List<ISong> { song.Object });
+        displayMock.Setup(x => x.IsThisTheRightSong(It.IsAny<string>())).Returns(SongResponse.Yes);
+
+        var callCount = 0;
+        consoleMock.Setup(x => x.ReadLine()).Returns(() => callCount++ switch
+        {
+            0 => "doors",
+            1 => ":s",
+            2 => ":n",
+            _ => ":q"
+        });
+
+        var engine = CreateEngine(songList: songListMock, display: displayMock, console: consoleMock);
+        engine.Start();
+
+        // :n follows the most recent request (random), not the earlier "doors" search.
+        songListMock.Verify(x => x.BuildShuffled(It.IsAny<ISongSources>()), Times.Exactly(2));
+        songListMock.Verify(x => x.Build(It.IsAny<ISongSources>(), "doors"), Times.Once);
+    }
+
+    [Fact]
+    public void Start_WithS_ThenPattern_ThenN_RepeatsPattern()
+    {
+        var songListMock = new Mock<ISongList>();
+        var displayMock = new Mock<IDisplay>();
+        var consoleMock = new Mock<IConsoleEngine>();
+
+        var song = new Mock<ISong>();
+        song.Setup(x => x.FullPath).Returns("song.mp3");
+        song.Setup(x => x.ShortenedPath).Returns("song");
+        songListMock.Setup(x => x.SongCollection).Returns(new List<ISong> { song.Object });
+        displayMock.Setup(x => x.IsThisTheRightSong(It.IsAny<string>())).Returns(SongResponse.Yes);
+
+        var callCount = 0;
+        consoleMock.Setup(x => x.ReadLine()).Returns(() => callCount++ switch
+        {
+            0 => ":s",
+            1 => "doors",
+            2 => ":n",
+            _ => ":q"
+        });
+
+        var engine = CreateEngine(songList: songListMock, display: displayMock, console: consoleMock);
+        engine.Start();
+
+        songListMock.Verify(x => x.BuildShuffled(It.IsAny<ISongSources>()), Times.Once);
+        songListMock.Verify(x => x.Build(It.IsAny<ISongSources>(), "doors"), Times.Exactly(2));
+    }
+
+    [Fact]
     public void Start_WithN_RepeatsLastPattern()
     {
         var songSourcesMock = new Mock<ISongSources>();

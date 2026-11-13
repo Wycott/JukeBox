@@ -41,6 +41,24 @@ public class SongListTest
     }
 
     [Fact]
+    public void BuildShuffled_ContainsEverySongFromTheParser()
+    {
+        var parserMock = new Mock<IFileSystemParser>();
+        var songSourcesMock = new Mock<ISongSources>();
+        var songs = Enumerable.Range(1, 50)
+            .Select(i => (ISong)new Song { FullPath = $"song{i}.mp3", ShortenedPath = $"song{i}" })
+            .ToList();
+        parserMock.Setup(x => x.ParseFileSystem(songSourcesMock.Object, "*")).Returns(songs);
+        var songList = new SongList(parserMock.Object);
+
+        songList.BuildShuffled(songSourcesMock.Object);
+
+        Assert.Equal(
+            songs.Select(s => s.FullPath).Order(),
+            songList.SongCollection.Select(s => s.FullPath).Order());
+    }
+
+    [Fact]
     public void SongCollection_DefaultsToEmptyList()
     {
         // Arrange & Act

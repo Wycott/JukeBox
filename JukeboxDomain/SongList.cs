@@ -10,4 +10,11 @@ public class SongList(IFileSystemParser fileSystemParser) : ISongList
     {
         SongCollection = fileSystemParser.ParseFileSystem(sources, selectedPattern);
     }
+
+    public void BuildShuffled(ISongSources sources)
+    {
+        SongCollection = fileSystemParser.ParseFileSystem(sources, "*")
+            .OrderBy(_ => Random.Shared.Next())
+            .ToList();
+    }
 }

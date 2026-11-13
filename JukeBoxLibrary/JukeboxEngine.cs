@@ -24,6 +24,7 @@ public class JukeboxEngine(
     private IBanList BanList { get; } = banList;
 
     private string lastPattern = string.Empty;
+    private bool lastRequestWasRandom;
     private string lastPlayedSong = string.Empty;
     private bool inFavouritesMode;
     private bool stopped;
@@ -351,6 +352,10 @@ public class JukeboxEngine(
             case ":e":
                 ListBannedSongs();
                 return JukeboxStateType.RequestSong;
+            case ":s":
+                inFavouritesMode = false;
+                lastRequestWasRandom = true;
+                return FindRandomSong();
             case ":n":
                 return PlayNext(out selectedPattern, out selectedSong);
         }
@@ -361,10 +366,27 @@ public class JukeboxEngine(
         }
 
         inFavouritesMode = false;
+        lastRequestWasRandom = false;
         lastPattern = input;
         selectedPattern = input;
 
         return JukeboxStateType.FindSong;
+    }
+
+    private JukeboxStateType FindRandomSong()
+    {
+        // Every song, shuffled, then offered one at a time with the usual y/n/b prompt,
+        // so "n" moves on to another random song.
+        SongList.BuildShuffled(SongSources);
+
+        if (SongList.SongCollection.Count > 0)
+        {
+            return JukeboxStateType.SelectVersion;
+        }
+
+        DisplayEngine.WriteError("No songs found!");
+
+        return JukeboxStateType.RequestSong;
     }
 
     private JukeboxStateType PlayNext(out string selectedPattern, out string selectedSong)
@@ -375,6 +397,11 @@ public class JukeboxEngine(
         if (inFavouritesMode)
         {
             return PlayRandomFavourite(out selectedSong);
+        }
+
+        if (lastRequestWasRandom)
+        {
+            return FindRandomSong();
         }
 
         if (lastPattern.Length > 0)
@@ -555,7 +582,8 @@ public class JukeboxEngine(
         ConsoleEngine.WriteALine("  *@doors         - might match anything by 'The Doors' (artist search)");
         ConsoleEngine.WriteALine();
         ConsoleEngine.WriteALine("Commands:");
-        ConsoleEngine.WriteALine("  :n  - Next (repeat last search or next favourite)");
+        ConsoleEngine.WriteALine("  :n  - Next (repeat last search, random song or next favourite)");
+        ConsoleEngine.WriteALine("  :s  - Select a random song (y to play, n for another)");
         ConsoleEngine.WriteALine("  :f  - Play a random favourite");
         ConsoleEngine.WriteALine("  :r  - Remove current song from favourites");
         ConsoleEngine.WriteALine("  :t  - Trim favourites (removes those with the fewest plays)");
