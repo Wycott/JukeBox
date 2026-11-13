@@ -117,6 +117,73 @@ public class FavouritesTest : IDisposable
     }
 
     [Fact]
+    public void GetRandomFavourite_PlaysEveryFavouriteBeforeRepeating()
+    {
+        var favourites = new Favourites(tempFile);
+        var paths = Enumerable.Range(1, 10).Select(i => $@"C:\Music\song{i}.mp3").ToList();
+
+        foreach (var path in paths)
+        {
+            favourites.RecordPlay(path);
+        }
+
+        for (var cycle = 0; cycle < 3; cycle++)
+        {
+            var picked = Enumerable.Range(0, paths.Count)
+                .Select(_ => favourites.GetRandomFavourite()!.FullPath)
+                .ToList();
+
+            Assert.Equal(paths.OrderBy(p => p), picked.OrderBy(p => p));
+        }
+    }
+
+    [Fact]
+    public void GetRandomFavourite_NewCycle_DoesNotRepeatLastPick()
+    {
+        var favourites = new Favourites(tempFile);
+        favourites.RecordPlay(@"C:\Music.mp3");
+        favourites.RecordPlay(@"C:\Music.mp3");
+
+        var previous = favourites.GetRandomFavourite()!.FullPath;
+
+        for (var i = 0; i < 20; i++)
+        {
+            var next = favourites.GetRandomFavourite()!.FullPath;
+            Assert.NotEqual(previous, next);
+            previous = next;
+        }
+    }
+
+    [Fact]
+    public void GetRandomFavourite_ReturnsRankByPlayCount()
+    {
+        var favourites = new Favourites(tempFile);
+        favourites.RecordPlay(@"C:\Music\only.mp3");
+        favourites.RecordPlay(@"C:\Music\only.mp3");
+
+        var result = favourites.GetRandomFavourite();
+
+        Assert.Equal(1, result!.Rank);
+    }
+
+    [Fact]
+    public void GetTopFavourites_AssignsRanksMostPlayedFirst()
+    {
+        var favourites = new Favourites(tempFile);
+        favourites.RecordPlay(@"C:\Music\low.mp3");
+        favourites.RecordPlay(@"C:\Music\high.mp3");
+        favourites.RecordPlay(@"C:\Music\high.mp3");
+        favourites.RecordPlay(@"C:\Music\high.mp3");
+        favourites.RecordPlay(@"C:\Music\mid.mp3");
+        favourites.RecordPlay(@"C:\Music\mid.mp3");
+
+        var top = favourites.GetTopFavourites();
+
+        Assert.Equal([@"C:\Music\high.mp3", @"C:\Music\mid.mp3", @"C:\Music\low.mp3"], top.Select(e => e.FullPath));
+        Assert.Equal([1, 2, 3], top.Select(e => e.Rank));
+    }
+
+    [Fact]
     public void RecordPlay_OverMax_StillAddsSong()
     {
         var favourites = new Favourites(tempFile, maxFavourites: 2);

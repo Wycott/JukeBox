@@ -287,7 +287,7 @@ public class JukeboxEngine(
 
         var fileName = Path.GetFileName(favourite.FullPath);
         ConsoleEngine.WriteALine();
-        ConsoleEngine.WriteText("Playing: ");
+        ConsoleEngine.WriteText($"Playing {favourite.Rank} of {Favourites.Count}: ");
         DisplayEngine.WriteYellowText(fileName);
         selectedSong = favourite.FullPath;
 
@@ -313,7 +313,7 @@ public class JukeboxEngine(
         foreach (var entry in favourites)
         {
             var fileName = Path.GetFileName(entry.FullPath);
-            DisplayEngine.WriteYellowText($"  {entry.PlayCount}x  {fileName}");
+            DisplayEngine.WriteYellowText($"  {entry.Rank,3}. {entry.PlayCount}x  {fileName}");
             displayed++;
 
             if (displayed % favouritesPageSize == 0 && displayed < favourites.Count)
