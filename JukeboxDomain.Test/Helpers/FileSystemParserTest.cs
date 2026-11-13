@@ -46,6 +46,27 @@ public class FileSystemParserTest : IDisposable
     }
 
     [Fact]
+    public void ParseFileSystem_WithStarPattern_ReturnsEveryAudioFile()
+    {
+        // SongList.BuildShuffled relies on "*" matching every song.
+        var doorsDir = Path.Combine(testRoot, "D", "The Doors");
+        var ahaDir = Path.Combine(testRoot, "A", "a-ha");
+        Directory.CreateDirectory(doorsDir);
+        Directory.CreateDirectory(ahaDir);
+        File.WriteAllText(Path.Combine(doorsDir, "01 Break On Through.mp3"), "");
+        File.WriteAllText(Path.Combine(ahaDir, "04 Foot Of The Mountain.m4a"), "");
+        File.WriteAllText(Path.Combine(ahaDir, "cover.jpg"), "");
+
+        var parser = new FileSystemParser(new Mock<IBanList>().Object);
+        var songSourcesMock = new Mock<ISongSources>();
+        songSourcesMock.Setup(x => x.Sources).Returns(new List<string> { testRoot + Path.DirectorySeparatorChar });
+
+        var result = parser.ParseFileSystem(songSourcesMock.Object, "*");
+
+        Assert.Equal(2, result.Count);
+    }
+
+    [Fact]
     public void ParseFileSystem_WithM4aFiles_ReturnsSongs()
     {
         // Arrange
