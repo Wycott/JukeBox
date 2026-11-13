@@ -584,6 +584,123 @@ public class JukeboxEngineFavouritesTest
     }
 
     [Fact]
+    public void SongFinished_InFavouritesMode_PlaysNextFavourite()
+    {
+        var songPlayerMock = new Mock<ISongPlayer>();
+        var consoleMock = new Mock<IConsoleEngine>();
+        var favouritesMock = new Mock<IFavourites>();
+
+        var firstPath = Path.Combine("C:", "Music", "first.mp3");
+        var secondPath = Path.Combine("C:", "Music", "second.mp3");
+        favouritesMock.Setup(x => x.Count).Returns(2);
+        favouritesMock.SetupSequence(x => x.GetRandomFavourite())
+            .Returns(new FavouriteEntry(firstPath, 5, 1))
+            .Returns(new FavouriteEntry(secondPath, 3, 2));
+
+        var callCount = 0;
+        consoleMock.Setup(x => x.ReadLine()).Returns(() =>
+        {
+            if (callCount++ == 0)
+            {
+                return ":f";
+            }
+
+            // The song ends while the user is sitting at the prompt.
+            songPlayerMock.Raise(x => x.SongFinished += null, EventArgs.Empty);
+            return ":q";
+        });
+
+        var engine = CreateEngine(songPlayer: songPlayerMock, console: consoleMock, favourites: favouritesMock);
+        engine.Start();
+
+        songPlayerMock.Verify(x => x.PlaySong(firstPath), Times.Once);
+        songPlayerMock.Verify(x => x.PlaySong(secondPath), Times.Once);
+        favouritesMock.Verify(x => x.RecordPlay(secondPath), Times.Once);
+        consoleMock.Verify(x => x.WriteText("Playing 2 of 2: "), Times.Once);
+        // Two prompts from the loop, plus one re-shown after the automatic play.
+        consoleMock.Verify(x => x.WriteText("Enter pattern or command "), Times.Exactly(3));
+    }
+
+    [Fact]
+    public void SongFinished_NotInFavouritesMode_DoesNothing()
+    {
+        var songPlayerMock = new Mock<ISongPlayer>();
+        var consoleMock = new Mock<IConsoleEngine>();
+        var favouritesMock = new Mock<IFavourites>();
+
+        consoleMock.Setup(x => x.ReadLine()).Returns(() =>
+        {
+            songPlayerMock.Raise(x => x.SongFinished += null, EventArgs.Empty);
+            return ":q";
+        });
+
+        var engine = CreateEngine(songPlayer: songPlayerMock, console: consoleMock, favourites: favouritesMock);
+        engine.Start();
+
+        favouritesMock.Verify(x => x.GetRandomFavourite(), Times.Never);
+        songPlayerMock.Verify(x => x.PlaySong(It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact]
+    public void SongFinished_AfterExit_DoesNothing()
+    {
+        var songPlayerMock = new Mock<ISongPlayer>();
+        var consoleMock = new Mock<IConsoleEngine>();
+        var favouritesMock = new Mock<IFavourites>();
+
+        var favPath = Path.Combine("C:", "Music", "fav.mp3");
+        favouritesMock.Setup(x => x.Count).Returns(1);
+        favouritesMock.Setup(x => x.GetRandomFavourite()).Returns(new FavouriteEntry(favPath, 5, 1));
+
+        var callCount = 0;
+        consoleMock.Setup(x => x.ReadLine()).Returns(() => callCount++ == 0 ? ":f" : ":q");
+
+        var engine = CreateEngine(songPlayer: songPlayerMock, console: consoleMock, favourites: favouritesMock);
+        engine.Start();
+
+        songPlayerMock.Raise(x => x.SongFinished += null, EventArgs.Empty);
+
+        songPlayerMock.Verify(x => x.PlaySong(favPath), Times.Once);
+    }
+
+    [Fact]
+    public void SongFinished_WhenNextFavouriteFails_TriesAnother()
+    {
+        var songPlayerMock = new Mock<ISongPlayer>();
+        var consoleMock = new Mock<IConsoleEngine>();
+        var favouritesMock = new Mock<IFavourites>();
+
+        var firstPath = Path.Combine("C:", "Music", "first.mp3");
+        var brokenPath = Path.Combine("C:", "Music", "broken.mp3");
+        var thirdPath = Path.Combine("C:", "Music", "third.mp3");
+        favouritesMock.Setup(x => x.Count).Returns(3);
+        favouritesMock.SetupSequence(x => x.GetRandomFavourite())
+            .Returns(new FavouriteEntry(firstPath, 5, 1))
+            .Returns(new FavouriteEntry(brokenPath, 4, 2))
+            .Returns(new FavouriteEntry(thirdPath, 3, 3));
+        songPlayerMock.Setup(x => x.PlaySong(brokenPath)).Returns(false);
+
+        var callCount = 0;
+        consoleMock.Setup(x => x.ReadLine()).Returns(() =>
+        {
+            if (callCount++ == 0)
+            {
+                return ":f";
+            }
+
+            songPlayerMock.Raise(x => x.SongFinished += null, EventArgs.Empty);
+            return ":q";
+        });
+
+        var engine = CreateEngine(songPlayer: songPlayerMock, console: consoleMock, favourites: favouritesMock);
+        engine.Start();
+
+        songPlayerMock.Verify(x => x.PlaySong(brokenPath), Times.Once);
+        songPlayerMock.Verify(x => x.PlaySong(thirdPath), Times.Once);
+        favouritesMock.Verify(x => x.RecordPlay(thirdPath), Times.Once);
+    }
+
+    [Fact]
     public void Start_WithF_ThenNewPattern_ExitsFavouritesMode()
     {
         var songSourcesMock = new Mock<ISongSources>();

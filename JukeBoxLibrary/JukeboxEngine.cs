@@ -25,10 +25,70 @@ public class JukeboxEngine(
     private string lastPattern = string.Empty;
     private string lastPlayedSong = string.Empty;
     private bool inFavouritesMode;
+    private bool stopped;
+
+    // Songs finishing are reported on a background thread, so anything that plays songs
+    // or changes engine state holds this lock.
+    private readonly Lock stateLock = new();
+
+    private const string Prompt = "Enter pattern or command ";
 
     public void Start(CancellationToken cancellationToken = default)
     {
-        LetTheMusicPlay(cancellationToken);
+        SongPlayer.SongFinished += OnSongFinished;
+
+        try
+        {
+            LetTheMusicPlay(cancellationToken);
+        }
+        finally
+        {
+            SongPlayer.SongFinished -= OnSongFinished;
+
+            lock (stateLock)
+            {
+                stopped = true;
+            }
+        }
+    }
+
+    private void OnSongFinished(object? sender, EventArgs e)
+    {
+        lock (stateLock)
+        {
+            if (stopped || !inFavouritesMode)
+            {
+                return;
+            }
+
+            if (PlayNextFavouriteAutomatically())
+            {
+                // The song info was printed over the waiting prompt, so show it again.
+                ConsoleEngine.WriteText(Prompt);
+            }
+        }
+    }
+
+    private bool PlayNextFavouriteAutomatically()
+    {
+        // Picks that are skipped (similar to banned) or fail to play shouldn't end the run,
+        // but give up after one full pass so a list of unplayable songs can't loop forever.
+        var attempts = Favourites.Count;
+
+        for (var i = 0; i < attempts && inFavouritesMode; i++)
+        {
+            if (PlayRandomFavourite(out var selectedSong) != JukeboxStateType.PlaySong)
+            {
+                continue;
+            }
+
+            if (PlaySongCore(selectedSong))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void LetTheMusicPlay(CancellationToken cancellationToken)
@@ -55,7 +115,10 @@ public class JukeboxEngine(
                     jukeboxState = SelectVersion(out selectedSong);
                     break;
                 case JukeboxStateType.PlaySong:
-                    jukeboxState = PlaySong(selectedSong);
+                    lock (stateLock)
+                    {
+                        jukeboxState = PlaySong(selectedSong);
+                    }
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -65,6 +128,13 @@ public class JukeboxEngine(
 
     private JukeboxStateType PlaySong(string selectedSong)
     {
+        PlaySongCore(selectedSong);
+
+        return JukeboxStateType.RequestSong;
+    }
+
+    private bool PlaySongCore(string selectedSong)
+    {
         // The selected song becomes "current" even when it fails, so :r and :b act on it
         // rather than on whatever played before.
         lastPlayedSong = selectedSong;
@@ -72,7 +142,7 @@ public class JukeboxEngine(
         if (!SongPlayer.PlaySong(selectedSong))
         {
             RemoveMissingFavourite(selectedSong);
-            return JukeboxStateType.RequestSong;
+            return false;
         }
 
         var countBefore = Favourites.Count;
@@ -80,7 +150,7 @@ public class JukeboxEngine(
         Favourites.RecordPlay(selectedSong);
         WarnIfNewSongTookFavouritesOverLimit(countBefore);
 
-        return JukeboxStateType.RequestSong;
+        return true;
     }
 
     private void WarnIfNewSongTookFavouritesOverLimit(int countBefore)
@@ -185,9 +255,20 @@ public class JukeboxEngine(
         selectedPattern = string.Empty;
         selectedSong = string.Empty;
 
-        ConsoleEngine.WriteText("Enter pattern or command ");
+        ConsoleEngine.WriteText(Prompt);
 
         var input = ConsoleEngine.ReadLine();
+
+        lock (stateLock)
+        {
+            return HandleInput(input, out selectedPattern, out selectedSong);
+        }
+    }
+
+    private JukeboxStateType HandleInput(string? input, out string selectedPattern, out string selectedSong)
+    {
+        selectedPattern = string.Empty;
+        selectedSong = string.Empty;
 
         switch (input?.ToLowerInvariant())
         {
