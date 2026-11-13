@@ -9,6 +9,9 @@ public interface IFavourites
     // Ordered by play count (most played first); each entry's Rank is its 1-based position.
     IReadOnlyList<FavouriteEntry> GetTopFavourites();
 
+    // The favourite's current rank (1 = most played), or null if it isn't a favourite.
+    int? GetRank(string fullPath);
+
     // Picks a random favourite not yet picked in the current cycle; once every favourite
     // has been picked, a new cycle starts.
     FavouriteEntry? GetRandomFavourite();
