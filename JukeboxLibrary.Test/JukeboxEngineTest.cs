@@ -868,8 +868,8 @@ public class JukeboxEngineFavouritesTest
         favouritesMock.Setup(x => x.Count).Returns(1);
         favouritesMock.Setup(x => x.GetRandomFavourite()).Returns(new FavouriteEntry(favPath, 5, 1));
 
-        using var pauseStarted = new ManualResetEventSlim();
-        consoleMock.Setup(x => x.WriteText("Queuing the next song...")).Callback(pauseStarted.Set);
+        var pauseStarted = new TaskCompletionSource();
+        consoleMock.Setup(x => x.WriteText("Queuing the next song...")).Callback(() => pauseStarted.TrySetResult());
 
         Task? songFinished = null;
         var callCount = 0;
@@ -883,7 +883,7 @@ public class JukeboxEngineFavouritesTest
                     // The song ends on a background thread, as it does for real; the user
                     // presses :n while the jukebox is pausing before the next song.
                     songFinished = Task.Run(() => songPlayerMock.Raise(x => x.SongFinished += null, EventArgs.Empty));
-                    Assert.True(pauseStarted.Wait(TimeSpan.FromSeconds(5)));
+                    Assert.True(pauseStarted.Task.Wait(TimeSpan.FromSeconds(5)));
                     return ":n";
                 default:
                     Assert.True(songFinished!.Wait(TimeSpan.FromSeconds(5)));
