@@ -417,41 +417,49 @@ public class JukeboxEngine(
 
     private JukeboxStateType PlayRandomFavourite(out string selectedSong)
     {
-        var favourite = Favourites.GetRandomFavourite();
+        // Banned or banned-like picks are skipped and another is drawn, so one unlucky pick
+        // doesn't end favourites mode. Give up after one full pass.
+        var attempts = Math.Max(Favourites.Count, 1);
 
-        if (favourite == null)
+        for (var i = 0; i < attempts; i++)
         {
-            DisplayEngine.WriteError("No favourites yet");
-            inFavouritesMode = false;
-            selectedSong = string.Empty;
+            var favourite = Favourites.GetRandomFavourite();
 
-            return JukeboxStateType.RequestSong;
+            if (favourite == null)
+            {
+                DisplayEngine.WriteError("No favourites yet");
+                inFavouritesMode = false;
+                selectedSong = string.Empty;
+
+                return JukeboxStateType.RequestSong;
+            }
+
+            if (BanList.IsBanned(favourite.FullPath))
+            {
+                continue;
+            }
+
+            var similarBanned = BanList.IsSimilarToBanned(favourite.FullPath);
+
+            if (similarBanned != null)
+            {
+                var skippedName = Path.GetFileName(favourite.FullPath);
+                var bannedName = Path.GetFileName(similarBanned);
+                DisplayEngine.WriteYellowText($"  Skipped: {skippedName} (similar to banned: {bannedName})");
+
+                continue;
+            }
+
+            selectedSong = favourite.FullPath;
+
+            return JukeboxStateType.PlaySong;
         }
 
-        if (BanList.IsBanned(favourite.FullPath))
-        {
-            DisplayEngine.WriteError("No favourites yet");
-            inFavouritesMode = false;
-            selectedSong = string.Empty;
+        DisplayEngine.WriteError("No playable favourites (the rest are banned)");
+        inFavouritesMode = false;
+        selectedSong = string.Empty;
 
-            return JukeboxStateType.RequestSong;
-        }
-
-        var similarBanned = BanList.IsSimilarToBanned(favourite.FullPath);
-
-        if (similarBanned != null)
-        {
-            var skippedName = Path.GetFileName(favourite.FullPath);
-            var bannedName = Path.GetFileName(similarBanned);
-            DisplayEngine.WriteYellowText($"  Skipped: {skippedName} (similar to banned: {bannedName})");
-            selectedSong = string.Empty;
-
-            return JukeboxStateType.RequestSong;
-        }
-
-        selectedSong = favourite.FullPath;
-
-        return JukeboxStateType.PlaySong;
+        return JukeboxStateType.RequestSong;
     }
 
     private void ListFavourites()
