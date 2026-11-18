@@ -677,6 +677,51 @@ public class JukeboxEngineFavouritesTest
     }
 
     [Fact]
+    public void Start_WithF_WhenFirstPickIsBanned_SkipsItAndPlaysAnotherFavourite()
+    {
+        var songPlayerMock = new Mock<ISongPlayer>();
+        var displayMock = new Mock<IDisplay>();
+        var favouritesMock = new Mock<IFavourites>();
+        var banListMock = new Mock<IBanList>();
+
+        var bannedPath = Path.Combine("C:", "Music", "banned.mp3");
+        var goodPath = Path.Combine("C:", "Music", "good.mp3");
+        var picks = new Queue<FavouriteEntry>([new FavouriteEntry(bannedPath, 5, 1), new FavouriteEntry(goodPath, 4, 2)]);
+        favouritesMock.Setup(x => x.GetRandomFavourite()).Returns(() => picks.Dequeue());
+        favouritesMock.Setup(x => x.Count).Returns(2);
+        banListMock.Setup(x => x.IsBanned(bannedPath)).Returns(true);
+
+        var consoleMock = new Mock<IConsoleEngine>();
+        var callCount = 0;
+        consoleMock.Setup(x => x.ReadLine()).Returns(() => callCount++ == 0 ? ":f" : ":q");
+
+        var engine = CreateEngine(songPlayer: songPlayerMock, display: displayMock, console: consoleMock, favourites: favouritesMock, banList: banListMock);
+        engine.Start();
+
+        songPlayerMock.Verify(x => x.PlaySong(goodPath), Times.Once);
+        songPlayerMock.Verify(x => x.PlaySong(bannedPath), Times.Never);
+        displayMock.Verify(x => x.WriteError(It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact]
+    public void Start_WithF_WhenAllFavouritesBanned_ShowsErrorAndStops()
+    {
+        var displayMock = new Mock<IDisplay>();
+        var favouritesMock = new Mock<IFavourites>();
+        var banListMock = new Mock<IBanList>();
+
+        var bannedPath = Path.Combine("C:", "Music", "banned.mp3");
+        favouritesMock.Setup(x => x.GetRandomFavourite()).Returns(new FavouriteEntry(bannedPath, 5, 1));
+        favouritesMock.Setup(x => x.Count).Returns(1);
+        banListMock.Setup(x => x.IsBanned(bannedPath)).Returns(true);
+
+        var engine = CreateEngine(display: displayMock, console: ConsoleTyping(":f"), favourites: favouritesMock, banList: banListMock);
+        engine.Start();
+
+        displayMock.Verify(x => x.WriteError("No playable favourites (the rest are banned)"), Times.Once);
+    }
+
+    [Fact]
     public void Start_WithF_ThenN_PlaysAnotherFavourite()
     {
         var songPlayerMock = new Mock<ISongPlayer>();
