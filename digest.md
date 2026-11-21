@@ -29,15 +29,23 @@ JukeBox is a .NET console jukebox application that scans configured file-system 
 
 | Metric | Value |
 |--------|-------|
-| Total commits | 159 |
+| Total commits | 163 |
 | First commit | Tuesday, 28 June 2022 |
-| Last commit | Wednesday, 18 November 2026 |
-| Days | 1604 |
+| Last commit | Saturday, 21 November 2026 |
+| Days | 1607 |
 | Weeks | 229 |
 | Months | 53 |
 | Years | 4 |
 
 ## Commits by Year
+
+| Year | Commits |
+|------|---------|
+| 2022 | 50 |
+| 2023 | 12 |
+| 2024 | 12 |
+| 2025 | 8 |
+| 2026 | 81 |
 
 ```mermaid
 pie title Commits by Year
@@ -45,5 +53,5 @@ pie title Commits by Year
     "2023" : 12
     "2024" : 12
     "2025" : 8
-    "2026" : 77
+    "2026" : 81
 ```
