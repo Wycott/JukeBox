@@ -16,24 +16,24 @@ JukeBox is a .NET console jukebox application that scans configured file-system 
 
 | Language | Count |
 |----------|-------|
-| C# | 35 |
+| C# | 40 |
 
 ## Unit Tests
 
 | Metric | Value |
 |--------|-------|
-| Total tests | 77 |
+| Total tests | 131 |
 | Framework | xUnit |
 
 ## Development History
 
 | Metric | Value |
 |--------|-------|
-| Total commits | 126 |
+| Total commits | 159 |
 | First commit | Tuesday, 28 June 2022 |
-| Last commit | Thursday, 5 November 2026 |
-| Days | 1591 |
-| Weeks | 227 |
+| Last commit | Wednesday, 18 November 2026 |
+| Days | 1604 |
+| Weeks | 229 |
 | Months | 53 |
 | Years | 4 |
 
@@ -45,5 +45,5 @@ pie title Commits by Year
     "2023" : 12
     "2024" : 12
     "2025" : 8
-    "2026" : 44
+    "2026" : 77
 ```
